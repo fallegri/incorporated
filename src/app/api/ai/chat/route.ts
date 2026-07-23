@@ -24,13 +24,14 @@ export async function POST(request: NextRequest) {
     if (!provider.capabilities.chat) {
       return NextResponse.json({
         response:
-          "El asistente IA no está configurado. Contacta al administrador para activar un proveedor (Gemini u Ollama).",
+          "El asistente IA no está configurado. Contacta al administrador para activar un proveedor (Gemini u Ollama). Mientras tanto, usa el análisis por patrones en 'Construir Lineamientos'.",
       });
     }
 
-    // Build messages array
+    // Build messages array — limit context to save tokens
     const messages: ChatMessage[] = [
-      ...(history || []).map((m: any) => ({
+      // Only keep last 4 messages of history to save tokens
+      ...(history || []).slice(-4).map((m: any) => ({
         role: m.role as "user" | "assistant",
         content: m.content,
       })),
