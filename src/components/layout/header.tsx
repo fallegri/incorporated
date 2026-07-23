@@ -1,6 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { ThemeSelector } from "./theme-selector";
 
 interface HeaderProps {
   user: { name?: string; email?: string };
@@ -14,12 +15,15 @@ export function Header({ user }: HeaderProps) {
           Bienvenido, <span className="font-medium text-gray-900">{user.name}</span>
         </p>
       </div>
-      <button
-        onClick={() => signOut({ callbackUrl: "/login" })}
-        className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
-      >
-        Cerrar sesión
-      </button>
+      <div className="flex items-center gap-3">
+        <ThemeSelector />
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+        >
+          Salir
+        </button>
+      </div>
     </header>
   );
 }
