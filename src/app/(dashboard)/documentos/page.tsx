@@ -41,6 +41,30 @@ export default function DocumentosPage() {
   const [textInput, setTextInput] = useState("");
   const [textTitle, setTextTitle] = useState("");
   const [docType, setDocType] = useState("OTRO");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  const handleAnalyze = async (text: string, name: string) => {
+    setAnalyzing(true);
+    setAnalysisResult(null);
+    try {
+      const res = await fetch("/api/docs/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, documentName: name }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAnalysisResult(data);
+      } else {
+        alert(data.error || "Error al analizar");
+      }
+    } catch {
+      alert("Error de conexión");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -90,9 +114,12 @@ export default function DocumentosPage() {
         format: "TEXTO",
         status: "UPLOADED",
         size: (textInput.length / 1024).toFixed(1) + " KB",
+        content: textInput,
         createdAt: new Date(),
       },
     ]);
+    // Auto-analyze pasted text
+    handleAnalyze(textInput, textTitle.trim());
     setTextInput("");
     setTextTitle("");
     setShowTextInput(false);
@@ -269,6 +296,15 @@ export default function DocumentosPage() {
                 <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
                   {doc.status}
                 </span>
+                {doc.content && (
+                  <button
+                    onClick={() => handleAnalyze(doc.content, doc.name)}
+                    disabled={analyzing}
+                    className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors disabled:opacity-50"
+                  >
+                    {analyzing ? "⏳" : "🔍"} Analizar
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -281,6 +317,134 @@ export default function DocumentosPage() {
           <p className="text-sm mt-1">
             Sube al menos un PEI o FODA para usar "Construir Lineamientos".
           </p>
+        </div>
+      )}
+
+      {/* Analysis Results */}
+      {analysisResult && (
+        <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">
+              📊 Análisis del Documento
+            </h2>
+            <span className={`text-xs px-2 py-1 rounded ${
+              analysisResult.aiEnhanced
+                ? "bg-violet-100 text-violet-700"
+                : "bg-blue-100 text-blue-700"
+            }`}>
+              {analysisResult.aiEnhanced ? "Con IA" : "Sin IA (patrones)"}
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-600">{analysisResult.resumen}</p>
+
+          {/* Detected Objectives */}
+          {analysisResult.objetivos?.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                🎯 Objetivos Detectados ({analysisResult.objetivos.length})
+              </h3>
+              <div className="space-y-2">
+                {analysisResult.objetivos.map((obj: any, i: number) => (
+                  <div key={i} className="border rounded-md p-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${
+                        obj.tipo === "estratégico" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
+                      }`}>{obj.tipo}</span>
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${
+                        obj.confidence === "alta" ? "bg-green-100 text-green-700" :
+                        obj.confidence === "media" ? "bg-yellow-100 text-yellow-700" :
+                        "bg-gray-100 text-gray-500"
+                      }`}>Confianza: {obj.confidence}</span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{obj.titulo}</p>
+                    {obj.actividades?.length > 0 && (
+                      <ul className="mt-2 space-y-1 pl-4">
+                        {obj.actividades.map((act: string, j: number) => (
+                          <li key={j} className="text-xs text-gray-600 list-disc">{act}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Detected KPIs */}
+          {analysisResult.kpis?.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                📈 KPIs Detectados ({analysisResult.kpis.length})
+              </h3>
+              <div className="space-y-2">
+                {analysisResult.kpis.map((kpi: any, i: number) => (
+                  <div key={i} className="border rounded-md p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-mono">
+                        {kpi.nomenclatura}
+                      </span>
+                      <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                        {kpi.perspectiva}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{kpi.nombre}</p>
+                    {kpi.objetivo && (
+                      <p className="text-xs text-gray-600 mt-1">Objetivo: {kpi.objetivo}</p>
+                    )}
+                    {kpi.formula && (
+                      <p className="text-xs text-gray-500 mt-1 font-mono bg-gray-50 px-2 py-1 rounded">
+                        {kpi.formula}
+                      </p>
+                    )}
+                    {kpi.condiciones?.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {kpi.condiciones.map((c: any, j: number) => (
+                          <span key={j} className={`text-xs px-1.5 py-0.5 rounded ${
+                            c.label === "Óptimo" ? "bg-green-50 text-green-600" :
+                            c.label === "Aceptable" ? "bg-yellow-50 text-yellow-600" :
+                            "bg-red-50 text-red-600"
+                          }`}>{c.valor}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Lineamientos */}
+          {analysisResult.lineamientos?.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                📜 Lineamientos ({analysisResult.lineamientos.length})
+              </h3>
+              <div className="space-y-2">
+                {analysisResult.lineamientos.map((lin: any, i: number) => (
+                  <div key={i} className="border rounded-md p-3">
+                    <p className="text-sm font-medium text-gray-900">{lin.titulo}</p>
+                    <p className="text-xs text-gray-500 mt-1">{lin.descripcion}</p>
+                    {lin.objetivos_asociados?.length > 0 && (
+                      <ul className="mt-2 space-y-1 pl-4">
+                        {lin.objetivos_asociados.slice(0, 5).map((obj: string, j: number) => (
+                          <li key={j} className="text-xs text-gray-600 list-disc">{obj}</li>
+                        ))}
+                        {lin.objetivos_asociados.length > 5 && (
+                          <li className="text-xs text-gray-400">... y {lin.objetivos_asociados.length - 5} más</li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Save button */}
+          <button className="w-full bg-blue-600 text-white font-medium py-3 rounded-md hover:bg-blue-700 transition-colors">
+            ✅ Guardar como mis lineamientos
+          </button>
         </div>
       )}
     </div>
