@@ -21,7 +21,7 @@ export class GeminiProvider implements AIProvider {
   };
 
   private get model() {
-    return google("gemini-1.5-flash");
+    return google("gemini-2.5-flash-preview-05-20");
   }
 
   private get embeddingModel() {
