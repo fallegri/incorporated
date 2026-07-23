@@ -1,57 +1,36 @@
-# Incorporated 🏢
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-> **Sistema inteligente de inserción laboral y alineamiento estratégico.**
+## Getting Started
 
-Incorporated ayuda a nuevos colaboradores a entender qué espera la empresa de su cargo, qué lineamientos y objetivos estratégicos existen, y cómo su rol contribuye al logro institucional.
+First, run the development server:
 
-## Características Principales
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-- 🎯 **Alineamiento estratégico:** OKRs, KPIs y objetivos vinculados al cargo
-- 📄 **Gestión documental:** Sube PEI, FODA, MOF y la IA genera lineamientos
-- 🤖 **IA Híbrida:** Funciona con Gemini (cloud), Ollama (local) o sin IA
-- 👥 **Modo Empresa:** Admin/RRHH gestiona estructura, cargos y documentos
-- 👤 **Modo Individual:** El usuario auto-gestiona sus documentos y objetivos
-- 🏗️ **Construye mis lineamientos:** IA analiza PEI/FODA y genera objetivos para tu cargo
-- ✅ **Checklist de onboarding:** Plan 30/60/90 días personalizado
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Stack Tecnológico
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-| Capa | Tecnología |
-|------|-----------|
-| Frontend | Next.js 14 (App Router) + Tailwind CSS + shadcn/ui |
-| Backend | Next.js API Routes |
-| Base de datos | Neon (PostgreSQL serverless) + pgvector |
-| ORM | Prisma |
-| Auth | NextAuth.js (Auth.js v5) |
-| Storage | Vercel Blob |
-| IA | Vercel AI SDK (Gemini / Ollama / Sin IA) |
-| RAG | LangChain.js + pgvector |
-| Deploy | Vercel |
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Modos de IA
+## Learn More
 
-| Modo | Descripción | Caso de Uso |
-|------|-------------|-------------|
-| **Gemini (Cloud)** | Google Gemini API | Empresas con acceso a internet |
-| **Ollama (Local)** | Modelo local (Llama, Mistral) | Empresas con data sensible |
-| **Sin IA** | Solo contenido estructurado manual | Entornos sin acceso a LLMs |
+To learn more about Next.js, take a look at the following resources:
 
-## Documentación
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-- 📄 [Especificaciones de Diseño (SDD)](docs/SDD_Incorporated.md)
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Estado del Proyecto
+## Deploy on Vercel
 
-- [x] Documento de especificaciones (SDD)
-- [ ] Setup del proyecto Next.js
-- [ ] Modelo de datos (Prisma)
-- [ ] Sistema de autenticación
-- [ ] Módulo de gestión de cargos
-- [ ] Pipeline RAG para documentos
-- [ ] Asistente IA
-- [ ] Modo "Construye mis lineamientos"
-- [ ] Deploy en Vercel
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Licencia
-
-Privado — Todos los derechos reservados.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
