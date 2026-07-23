@@ -106,18 +106,25 @@ export default function DocumentosPage() {
       return;
     }
 
-    setDocuments((prev) => [
-      ...prev,
-      {
-        name: textTitle.trim(),
-        type: docType,
-        format: "TEXTO",
-        status: "UPLOADED",
-        size: (textInput.length / 1024).toFixed(1) + " KB",
-        content: textInput,
-        createdAt: new Date(),
-      },
-    ]);
+    const newDoc = {
+      name: textTitle.trim(),
+      type: docType,
+      format: "TEXTO",
+      status: "UPLOADED",
+      size: (textInput.length / 1024).toFixed(1) + " KB",
+      content: textInput,
+      createdAt: new Date(),
+    };
+
+    setDocuments((prev) => {
+      const updated = [...prev, newDoc];
+      // Save to localStorage for /construir page to access
+      try {
+        localStorage.setItem("incorporated_docs", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
     // Auto-analyze pasted text
     handleAnalyze(textInput, textTitle.trim());
     setTextInput("");
@@ -308,6 +315,26 @@ export default function DocumentosPage() {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* CTA: Go to construir after uploading */}
+      {documents.length > 0 && !analysisResult && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-green-800">
+              ✅ Documento cargado correctamente
+            </p>
+            <p className="text-xs text-green-700 mt-1">
+              Ahora puedes analizar el documento para extraer objetivos y KPIs.
+            </p>
+          </div>
+          <a
+            href="/construir"
+            className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex-shrink-0"
+          >
+            🏗️ Construir lineamientos →
+          </a>
         </div>
       )}
 
