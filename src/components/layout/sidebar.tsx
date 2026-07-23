@@ -15,6 +15,7 @@ const navItems = [
   { href: "/construir", label: "Construir Lineamientos", icon: "🏗️", roles: "all" },
   { href: "/asistente", label: "Asistente IA", icon: "💬", roles: "all" },
   { href: "/admin", label: "Administración", icon: "⚙️", roles: "ADMIN,SUPER_ADMIN,DIRECTOR" },
+  { href: "/admin/configuracion", label: "Configuración", icon: "🎨", roles: "all" },
 ];
 
 export function Sidebar({ user }: SidebarProps) {
