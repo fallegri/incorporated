@@ -216,6 +216,17 @@ enum DocumentType {
   OTRO
 }
 
+enum DocumentFormat {
+  PDF
+  DOCX
+  DOC
+  XLSX
+  XLS
+  TXT
+  MD
+  TEXT
+}
+
 enum DocumentStatus {
   UPLOADED
   EXTRACTING
@@ -229,7 +240,9 @@ model Document {
   id             String         @id @default(cuid())
   name           String
   type           DocumentType   @default(OTRO)
-  url            String
+  format         DocumentFormat @default(PDF)
+  url            String?
+  rawText        String?        @map("raw_text") @db.Text
   status         DocumentStatus @default(UPLOADED)
   chunksCount    Int            @default(0) @map("chunks_count")
   errorMessage   String?        @map("error_message")
