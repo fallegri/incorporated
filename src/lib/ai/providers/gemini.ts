@@ -21,7 +21,8 @@ export class GeminiProvider implements AIProvider {
   };
 
   private get model() {
-    return google("gemini-2.5-flash-preview-05-20");
+    // Gemini 2.5 Flash — available in free tier, fast and capable
+    return google("gemini-2.5-flash-preview-04-17");
   }
 
   private get embeddingModel() {
