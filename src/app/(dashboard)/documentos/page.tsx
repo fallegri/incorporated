@@ -173,10 +173,13 @@ export default function DocumentosPage() {
               {uploading ? "Procesando archivo..." : "Click para seleccionar archivo"}
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              PDF, Word (.docx), TXT, Markdown — máx. 20MB
+              Word (.docx), TXT, Markdown — máx. 20MB
             </p>
             <p className="text-xs text-gray-400">
               El sistema extrae el texto automáticamente
+            </p>
+            <p className="text-xs text-amber-500 mt-1">
+              PDF: convierte a Word o usa "Pegar texto"
             </p>
           </div>
           <input

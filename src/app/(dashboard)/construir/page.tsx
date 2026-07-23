@@ -308,9 +308,84 @@ export default function ConstruirPage() {
           )}
 
           {(result.objetivos?.length > 0 || result.kpis?.length > 0) && (
-            <button className="w-full bg-blue-600 text-white font-medium py-3 rounded-md hover:bg-blue-700 transition-colors">
-              ✅ Guardar como mis lineamientos
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/docs/analyze/save", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ objetivos: result.objetivos, kpis: result.kpis }),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      alert(`✅ ${data.message}`);
+                    } else {
+                      alert(data.error || "Error al guardar");
+                    }
+                  } catch {
+                    alert("Error de conexión");
+                  }
+                }}
+                className="flex-1 bg-blue-600 text-white font-medium py-3 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                💾 Guardar como mis lineamientos
+              </button>
+              <button
+                onClick={() => {
+                  const printWindow = window.open("", "_blank");
+                  if (!printWindow) return;
+                  const html = `
+                    <html><head><title>Análisis - Incorporated</title>
+                    <style>
+                      body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px 20px; color: #333; }
+                      h1 { font-size: 24px; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+                      h2 { font-size: 18px; color: #1e40af; margin-top: 30px; }
+                      h3 { font-size: 14px; color: #374151; margin-top: 20px; }
+                      .obj { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 12px 0; }
+                      .tipo { display: inline-block; font-size: 11px; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; }
+                      .kpi { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; margin: 8px 0; }
+                      .formula { font-family: monospace; background: #f9fafb; padding: 8px; border-radius: 4px; font-size: 12px; }
+                      .act { font-size: 13px; color: #4b5563; padding: 4px 0; }
+                      .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #9ca3af; }
+                      @media print { body { padding: 20px; } }
+                    </style></head><body>
+                    <h1>📊 Análisis de Lineamientos</h1>
+                    <p style="color:#6b7280;font-size:14px;">${result.resumen || ""}</p>
+                    ${result.objetivos?.length ? `
+                      <h2>🎯 Objetivos Detectados (${result.objetivos.length})</h2>
+                      ${result.objetivos.map((obj: any, i: number) => `
+                        <div class="obj">
+                          <span class="tipo">${obj.tipo}</span>
+                          <h3>${i+1}. ${obj.titulo}</h3>
+                          ${obj.actividades?.length ? `<div style="margin-top:8px;padding-left:16px;border-left:3px solid #93c5fd;">
+                            ${obj.actividades.map((a: string) => `<p class="act">• ${a}</p>`).join("")}
+                          </div>` : ""}
+                        </div>
+                      `).join("")}
+                    ` : ""}
+                    ${result.kpis?.length ? `
+                      <h2>📈 KPIs Detectados (${result.kpis.length})</h2>
+                      ${result.kpis.map((kpi: any) => `
+                        <div class="kpi">
+                          <strong>${kpi.nomenclatura}</strong> — ${kpi.nombre}
+                          <br/><span style="font-size:12px;color:#6b7280;">Perspectiva: ${kpi.perspectiva}</span>
+                          ${kpi.formula ? `<div class="formula">Fórmula: ${kpi.formula}</div>` : ""}
+                        </div>
+                      `).join("")}
+                    ` : ""}
+                    <div class="footer">Generado por Incorporated — ${new Date().toLocaleDateString()}</div>
+                    </body></html>
+                  `;
+                  printWindow.document.write(html);
+                  printWindow.document.close();
+                  setTimeout(() => printWindow.print(), 500);
+                }}
+                className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 transition-colors"
+              >
+                🖨️ Imprimir
+              </button>
+            </div>
           )}
         </div>
       )}

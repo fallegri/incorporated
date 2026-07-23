@@ -50,14 +50,10 @@ export async function POST(request: NextRequest) {
     switch (ext) {
       case "pdf":
         format = "PDF";
-        try {
-          textContent = await parsePDF(buffer);
-        } catch {
-          return NextResponse.json(
-            { error: "No se pudo leer el PDF. Verifica que no esté protegido." },
-            { status: 400 }
-          );
-        }
+        return NextResponse.json(
+          { error: "PDF temporalmente no soportado en este servidor. Por favor convierte tu PDF a Word (.docx) o copia el texto y usa la opción 'Pegar texto'." },
+          { status: 400 }
+        );
         break;
 
       case "docx":
