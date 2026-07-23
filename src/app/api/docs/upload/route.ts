@@ -3,8 +3,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import mammoth from "mammoth";
 
-// pdf-parse doesn't have proper ESM exports
-const pdfParse = require("pdf-parse");
+// Dynamic import to avoid pdf-parse test file issue at build time
+async function parsePDF(buffer: Buffer): Promise<string> {
+  const pdf = (await import("pdf-parse")).default;
+  const data = await pdf(buffer);
+  return data.text;
+}
 
 /**
  * POST /api/docs/upload
@@ -47,8 +51,7 @@ export async function POST(request: NextRequest) {
       case "pdf":
         format = "PDF";
         try {
-          const pdfData = await pdfParse(buffer);
-          textContent = pdfData.text;
+          textContent = await parsePDF(buffer);
         } catch {
           return NextResponse.json(
             { error: "No se pudo leer el PDF. Verifica que no esté protegido." },
