@@ -1,12 +1,10 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-  extensions = [vector]
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================================
@@ -251,7 +249,7 @@ model Document {
 model DocumentChunk {
   id          String                    @id @default(cuid())
   content     String
-  embedding   Unsupported("vector(768)")?
+  embedding   String?  @db.Text  // Will store vector as JSON string until pgvector extension is enabled
   chunkIndex  Int                       @map("chunk_index")
   metadata    Json?
   createdAt   DateTime                  @default(now()) @map("created_at")
