@@ -25,13 +25,12 @@ async function main() {
     return;
   }
 
-  // Get or create cargo for admin
-  let cargoId = admin.cargoId;
+  let cargoId: string | null = admin.cargoId;
   if (!cargoId) {
     const cargo = await prisma.cargo.findFirst({
       where: { organizationId: admin.organizationId! },
     });
-    cargoId = cargo?.id;
+    cargoId = cargo?.id || null;
   }
 
   if (!cargoId) {
