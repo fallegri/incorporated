@@ -7,49 +7,122 @@ interface SidebarProps {
   user: { name?: string; role: string; organizationId?: string };
 }
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "📊", roles: "all" },
-  { href: "/cargo", label: "Mi Cargo", icon: "👤", roles: "all" },
-  { href: "/objetivos", label: "Objetivos", icon: "🎯", roles: "all" },
-  { href: "/documentos", label: "Documentos", icon: "📄", roles: "all" },
-  { href: "/construir", label: "Construir Lineamientos", icon: "🏗️", roles: "all" },
-  { href: "/asistente", label: "Asistente IA", icon: "💬", roles: "all" },
-  { href: "/admin", label: "Administración", icon: "⚙️", roles: "ADMIN,SUPER_ADMIN,DIRECTOR" },
-  { href: "/admin/configuracion", label: "Configuración", icon: "🎨", roles: "all" },
+interface NavItem {
+  href: string;
+  label: string;
+  icon: string;
+  roles: string;
+}
+
+interface NavGroup {
+  title?: string;
+  roles: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    roles: "all",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: "📊", roles: "all" },
+    ],
+  },
+  {
+    title: "MI GESTION",
+    roles: "all",
+    items: [
+      { href: "/objetivos", label: "Objetivos y Metas", icon: "🎯", roles: "all" },
+      { href: "/actividades", label: "Mis Actividades", icon: "✅", roles: "all" },
+      { href: "/kpis", label: "Mis KPIs", icon: "📈", roles: "all" },
+      { href: "/cargo", label: "Checklist Onboarding", icon: "📋", roles: "all" },
+    ],
+  },
+  {
+    title: "DOCUMENTOS",
+    roles: "all",
+    items: [
+      { href: "/documentos", label: "Biblioteca de Documentos", icon: "📄", roles: "all" },
+      { href: "/construir", label: "Construir Lineamientos", icon: "🏗️", roles: "all" },
+      { href: "/asistente", label: "Asistente IA", icon: "💬", roles: "all" },
+    ],
+  },
+  {
+    title: "ORGANIZACION",
+    roles: "ADMIN,SUPER_ADMIN,DIRECTOR,JEFE_AREA",
+    items: [
+      { href: "/admin", label: "Equipo y Avance", icon: "👥", roles: "ADMIN,SUPER_ADMIN,DIRECTOR,JEFE_AREA" },
+      { href: "/admin/configuracion", label: "Estructura", icon: "🏢", roles: "ADMIN,SUPER_ADMIN,DIRECTOR" },
+      { href: "/reportes", label: "Reportes", icon: "📑", roles: "ADMIN,SUPER_ADMIN,DIRECTOR,JEFE_AREA" },
+    ],
+  },
+  {
+    title: "SISTEMA",
+    roles: "all",
+    items: [
+      { href: "/admin/configuracion", label: "Configuracion", icon: "⚙️", roles: "all" },
+      { href: "/notificaciones", label: "Notificaciones", icon: "🔔", roles: "all" },
+    ],
+  },
 ];
+
+function isGroupVisible(group: NavGroup, userRole: string): boolean {
+  return group.roles === "all" || group.roles.split(",").includes(userRole);
+}
+
+function isItemVisible(item: NavItem, userRole: string): boolean {
+  return item.roles === "all" || item.roles.split(",").includes(userRole);
+}
 
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
-
-  const visibleItems = navItems.filter(
-    (item) => item.roles === "all" || item.roles.split(",").includes(user.role)
-  );
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200">
         <h1 className="text-xl font-bold text-gray-900">Incorporated</h1>
-        <p className="text-xs text-gray-500 mt-1">Alineamiento Estratégico</p>
+        <p className="text-xs text-gray-500 mt-1">Alineamiento Estrategico</p>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {visibleItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+      <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
+        {navGroups.map((group, groupIdx) => {
+          if (!isGroupVisible(group, user.role)) return null;
+
+          const visibleItems = group.items.filter((item) =>
+            isItemVisible(item, user.role)
+          );
+          if (visibleItems.length === 0) return null;
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-blue-50 text-blue-700 border-l-3 border-blue-600"
-                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              {item.label}
-            </Link>
+            <div key={groupIdx}>
+              {group.title && (
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 mb-1">
+                  {group.title}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {visibleItems.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.href + item.label}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-blue-50 text-blue-700 border-l-3 border-blue-600"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
+                    >
+                      <span className="text-base">{item.icon}</span>
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </nav>
