@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { permissions, auditLog, checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/security";
 
-/**
- * GET /api/settings/ai — Get current AI configuration for the org
- */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
@@ -24,14 +22,10 @@ export async function GET() {
   return NextResponse.json({
     provider: org?.aiProvider || "none",
     configured: org?.aiProvider !== "none",
-    // Don't expose the actual key, just whether one exists
     hasApiKey: !!process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   });
 }
 
-/**
- * PUT /api/settings/ai — Update AI provider for the org
- */
 export async function PUT(request: NextRequest) {
   const session = await auth();
   if (!session?.user) {
@@ -39,8 +33,23 @@ export async function PUT(request: NextRequest) {
   }
 
   const user = session.user as any;
-  if (!user.organizationId) {
-    return NextResponse.json({ error: "Sin organización" }, { status: 400 });
+
+  // RBAC: Only admins can change AI provider
+  if (!permissions.canChangeAIProvider(user.role)) {
+    return NextResponse.json(
+      { error: "No tienes permisos para cambiar la configuración de IA. Se requiere rol Admin." },
+      { status: 403 }
+    );
+  }
+
+  // Rate limiting
+  const ip = getClientIP(request.headers);
+  const rl = checkRateLimit(`settings:${user.id}`, RATE_LIMITS.api);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes. Intenta en unos segundos." },
+      { status: 429 }
+    );
   }
 
   try {
@@ -55,13 +64,15 @@ export async function PUT(request: NextRequest) {
       data: { aiProvider: provider },
     });
 
+    auditLog("AI_PROVIDER_CHANGED", user.id, ip, { provider });
+
     return NextResponse.json({
       message: `Proveedor IA actualizado a: ${provider}`,
       provider,
     });
   } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al actualizar: " + error.message },
+      { error: "Error al actualizar configuración" },
       { status: 500 }
     );
   }

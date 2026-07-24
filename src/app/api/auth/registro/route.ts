@@ -2,19 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { checkRateLimit, getClientIP, RATE_LIMITS, auditLog, sanitizeText } from "@/lib/security";
 
 const RegistroSchema = z.object({
   email: z.string().email("Email inválido"),
-  password: z.string().min(8, "Mínimo 8 caracteres"),
-  name: z.string().min(2, "Nombre requerido"),
+  password: z.string().min(8, "Mínimo 8 caracteres").max(128),
+  name: z.string().min(2, "Nombre requerido").max(100),
   mode: z.enum(["enterprise", "individual"]),
-  organizationName: z.string().optional(),
+  organizationName: z.string().max(200).optional(),
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const ip = getClientIP(request.headers);
+  const rl = checkRateLimit(`registro:${ip}`, RATE_LIMITS.registro);
+  if (!rl.allowed) {
+    auditLog("RATE_LIMITED", undefined, ip, { endpoint: "registro" });
+    return NextResponse.json(
+      { error: "Demasiados intentos de registro. Intenta más tarde." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const data = RegistroSchema.parse(body);
+
+    // Sanitize inputs
+    const cleanName = sanitizeText(data.name, 100);
+    const cleanOrgName = data.organizationName ? sanitizeText(data.organizationName, 200) : undefined;
 
     // Check if email already exists
     const existing = await prisma.user.findUnique({
@@ -31,20 +47,18 @@ export async function POST(request: NextRequest) {
 
     // Create org + user in transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Create organization
       const org = await tx.organization.create({
         data: {
-          name: data.organizationName || `Org de ${data.name}`,
+          name: cleanOrgName || `Org de ${cleanName}`,
           mode: data.mode,
-          aiProvider: "none", // Default: sin IA hasta que configure
+          aiProvider: "none",
         },
       });
 
-      // Create user with admin role
       const user = await tx.user.create({
         data: {
           email: data.email,
-          name: data.name,
+          name: cleanName,
           passwordHash,
           role: data.mode === "enterprise" ? "ADMIN" : "INDIVIDUAL",
           organizationId: org.id,
@@ -53,6 +67,8 @@ export async function POST(request: NextRequest) {
 
       return { user, org };
     });
+
+    auditLog("REGISTER", result.user.id, ip, { mode: data.mode });
 
     return NextResponse.json(
       {

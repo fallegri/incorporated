@@ -55,6 +55,8 @@ model User {
   passwordHash   String?   @map("password_hash")
   role           Role      @default(COLABORADOR)
   isActive       Boolean   @default(true) @map("is_active")
+  twoFactorSecret String?  @map("two_factor_secret")
+  twoFactorEnabled Boolean @default(false) @map("two_factor_enabled")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
