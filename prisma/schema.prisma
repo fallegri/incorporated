@@ -143,7 +143,8 @@ model Objetivo {
   tipo             ObjetivoTipo   @default(ESTRATEGICO)
   alineamientoPei  String?        @map("alineamiento_pei")
   estado           ObjetivoEstado @default(BORRADOR)
-  periodo          String?
+  periodo          String?        // e.g. "2024", "2023"
+  gestion          String?        // Gestión/año al que pertenece
   generadoPorIA    Boolean        @default(false) @map("generado_por_ia")
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
@@ -196,6 +197,7 @@ model Actividad {
   descripcion String
   plazoDias   String   @map("plazo_dias")
   prioridad   String   @default("media")
+  estado      String   @default("pendiente") // pendiente, en_curso, terminado
   completada  Boolean  @default(false)
   completadaAt DateTime? @map("completada_at")
   createdAt   DateTime @default(now()) @map("created_at")

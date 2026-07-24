@@ -7,6 +7,7 @@ interface Actividad {
   descripcion: string;
   plazoDias: string;
   prioridad: string;
+  estado: string;
   completada: boolean;
 }
 
@@ -37,9 +38,45 @@ interface Props {
 
 export function ObjetivosList({ objetivos }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [activities, setActivities] = useState<Record<string, Actividad[]>>(() => {
+    const map: Record<string, Actividad[]> = {};
+    for (const obj of objetivos) {
+      map[obj.id] = obj.actividades;
+    }
+    return map;
+  });
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
+  };
+
+  const cycleEstado = async (actId: string, objId: string, currentEstado: string) => {
+    const nextEstado = currentEstado === "pendiente" ? "en_curso" :
+                       currentEstado === "en_curso" ? "terminado" : "pendiente";
+
+    // Optimistic update
+    setActivities((prev) => ({
+      ...prev,
+      [objId]: prev[objId].map((a) =>
+        a.id === actId ? { ...a, estado: nextEstado, completada: nextEstado === "terminado" } : a
+      ),
+    }));
+
+    try {
+      await fetch(`/api/actividades/${actId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: nextEstado }),
+      });
+    } catch {
+      // Revert on error
+      setActivities((prev) => ({
+        ...prev,
+        [objId]: prev[objId].map((a) =>
+          a.id === actId ? { ...a, estado: currentEstado, completada: currentEstado === "terminado" } : a
+        ),
+      }));
+    }
   };
 
   return (
@@ -127,20 +164,29 @@ export function ObjetivosList({ objetivos }: Props) {
                     Actividades ({obj.actividades.length})
                   </p>
                   <div className="space-y-2">
-                    {obj.actividades.map((act) => (
+                    {(activities[obj.id] || obj.actividades).map((act) => (
                       <div
                         key={act.id}
                         className="flex items-start gap-3 p-3 bg-white border rounded-md"
                       >
-                        <input
-                          type="checkbox"
-                          checked={act.completada}
-                          readOnly
-                          className="mt-0.5 w-4 h-4 rounded text-blue-600"
-                        />
+                        <button
+                          onClick={(e) => { e.stopPropagation(); cycleEstado(act.id, obj.id, act.estado || "pendiente"); }}
+                          className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                            act.estado === "terminado" ? "bg-green-500 border-green-500 text-white" :
+                            act.estado === "en_curso" ? "bg-yellow-400 border-yellow-400 text-white" :
+                            "border-gray-300 hover:border-blue-400"
+                          }`}
+                          title={`Estado: ${act.estado || "pendiente"} — click para cambiar`}
+                        >
+                          {act.estado === "terminado" && <span className="text-xs">✓</span>}
+                          {act.estado === "en_curso" && <span className="text-xs">▶</span>}
+                        </button>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm ${act.completada ? "line-through text-gray-400" : "text-gray-900"}`}>
+                          <p className={`text-sm ${act.estado === "terminado" ? "line-through text-gray-400" : "text-gray-900"}`}>
                             {act.descripcion}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {act.estado === "terminado" ? "✅ Terminado" : act.estado === "en_curso" ? "🔄 En curso" : "⏳ Pendiente"}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
@@ -151,17 +197,13 @@ export function ObjetivosList({ objetivos }: Props) {
                           }`}>
                             {act.plazoDias} días
                           </span>
-                          <span className={`text-xs px-2 py-0.5 rounded ${
-                            act.prioridad === "alta" ? "bg-red-50 text-red-600" :
-                            act.prioridad === "media" ? "bg-yellow-50 text-yellow-600" :
-                            "bg-gray-50 text-gray-500"
-                          }`}>
-                            {act.prioridad}
-                          </span>
                         </div>
                       </div>
                     ))}
                   </div>
+                  <p className="text-xs text-gray-400 mt-2 italic">
+                    💡 Click en el círculo para cambiar estado: pendiente → en curso → terminado
+                  </p>
                 </div>
               )}
 
