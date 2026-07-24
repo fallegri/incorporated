@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
+import { Comparativa } from "@/components/dashboard/comparativa";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -181,6 +182,9 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Comparativa between gestiones */}
+      {hasData && <Comparativa />}
 
       {/* Quick actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
