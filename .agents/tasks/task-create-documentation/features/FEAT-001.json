@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-001",
+  "type": "docs",
+  "description": "Create comprehensive documentation for Incorporated: sequence diagrams (Mermaid), class diagram (Mermaid), technical manual (architecture, deployment, API reference), and user manual (step-by-step guide for every feature)",
+  "status": "in_progress",
+  "steps": [
+    "Create docs/diagramas-secuencia.md with Mermaid sequence diagrams covering all key flows: (1) User Registration (enterprise and individual modes), (2) Login with optional 2FA, (3) Document Upload and Processing, (4) Document Analysis (pattern-based without AI), (5) Build Lineamientos with AI (Gemini), (6) AI Chat/Assistant (RAG flow), (7) Activity State Machine (pendiente -> en_curso -> terminado with auto-update of parent Objetivo), (8) KPI Update with semaforo calculation, (9) Manager/Admin View (gerente dashboard), (10) Multi-gestion Comparativa, (11) Report Generation, (12) 2FA Setup and Verification. Each diagram should accurately reflect the actual API routes, services, and database interactions found in the codebase.",
+    "Create docs/diagrama-clases.md with a comprehensive Mermaid class diagram showing: (1) All Prisma models (Organization, User, Area, Cargo, Objetivo, KPI, OKR, Actividad, Document, DocumentChunk, OnboardingChecklist, ChatSession, ChatMessage) with their fields, (2) TypeScript interfaces (AIProvider, AICapabilities, ChatMessage, RAGContext), (3) Provider classes (GeminiProvider, OllamaProvider, NoAIProvider), (4) Security modules (RoleGuard, RateLimiter, AuditLog), (5) Service classes (DocumentAnalyzer), (6) Relationships between all entities. Use accurate field names from prisma/schema.prisma.",
+    "Create docs/manual-tecnico.md covering: (1) Architecture overview (monorepo Next.js, layered: Presentation/Application/Domain/Infrastructure), (2) Technology stack with versions, (3) Project structure explanation (src/app, src/lib, src/components, prisma), (4) Authentication system (NextAuth.js v5 with JWT, credential provider, 2FA TOTP), (5) Authorization (RBAC with role hierarchy levels: SUPER_ADMIN=100, ADMIN=80, DIRECTOR=60, JEFE_AREA=40, JEFE_PROYECTO=30, COLABORADOR=20, INDIVIDUAL=10), (6) AI System (Strategy Pattern, provider factory, Gemini/Ollama/None modes, capabilities interface), (7) Document Processing Pipeline (upload -> text extraction -> analysis), (8) Security (rate limiting configs, audit logging, input sanitization, file validation, middleware), (9) Database schema (Neon PostgreSQL, multi-tenant by org_id), (10) API Reference (all endpoints with methods, params, responses, auth requirements), (11) Deployment (Vercel, env vars: DATABASE_URL, NEXTAUTH_SECRET, AI_PROVIDER, GOOGLE_GENERATIVE_AI_API_KEY, OLLAMA_BASE_URL), (12) Environment setup for development.",
+    "Create docs/manual-usuario.md as a complete step-by-step user guide in Spanish covering: (1) Getting Started / First Access, (2) Registration (individual mode vs enterprise mode), (3) Login, (4) Dashboard overview (stats cards, activity list, progress), (5) Document Upload (supported formats, size limits, types PEI/FODA/MOF/POI), (6) Build Lineamientos - pattern analysis mode (select docs, analyze, view objectives/KPIs, save), (7) Build Lineamientos - AI mode (generate with Gemini, review, confirm), (8) Managing Objectives (view, status tracking), (9) Activity Management (state transitions: pendiente -> en_curso -> terminado), (10) KPI Tracking (update values, semaforo: verde >=75%, amarillo >=50%, rojo <50%), (11) AI Assistant (chat interface, contextual questions), (12) Onboarding Checklist (30/60/90 days), (13) Admin Panel - Team Management (view employees, progress), (14) Organization Structure (areas, cargos, hierarchy), (15) Reports (progress, POA, KPIs - with filtering by gestion), (16) 2FA Security Setup (QR code, Google Authenticator, verify), (17) Theme Selector (6 themes: Default, Oscuro, Calido, Verde, Violeta, Contraste), (18) Notifications (due date alerts, KPI alerts, priority levels), (19) Multi-gestion Comparativa (year-over-year metrics), (20) Manager Dual View. Include descriptions of what the user should see at each step (placeholder for screenshots). All content in Spanish."
+  ],
+  "acceptance_criteria": [
+    "docs/diagramas-secuencia.md exists with at least 10 Mermaid sequence diagrams that use valid Mermaid sequenceDiagram syntax",
+    "docs/diagrama-clases.md exists with a Mermaid classDiagram showing all 13 Prisma models with fields and relationships",
+    "docs/manual-tecnico.md exists with at least 10 major sections covering architecture, API reference, security, and deployment",
+    "docs/manual-usuario.md exists with step-by-step instructions in Spanish for at least 15 features of the system",
+    "All Mermaid diagrams use valid syntax (sequenceDiagram, classDiagram keywords)",
+    "API reference in technical manual covers all 15+ endpoints found in src/app/api/",
+    "Documentation accurately reflects actual code patterns (role hierarchy values, rate limit configs, AI provider interface, activity state machine)"
+  ],
+  "verification": [
+    "Verify all 4 documentation files exist in docs/ directory",
+    "Run a basic syntax check on Mermaid blocks: grep for 'sequenceDiagram' and 'classDiagram' keywords",
+    "Verify the build still passes after adding documentation: run the build command"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
