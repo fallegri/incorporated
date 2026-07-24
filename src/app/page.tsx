@@ -1,8 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { ThemeSelector } from "@/components/layout/theme-selector";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-900">
+      <div className="absolute top-4 right-4">
+        <ThemeSelector />
+      </div>
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
         <h1 className="text-5xl font-bold text-gray-900 mb-4">
           Incorporated
