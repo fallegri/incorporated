@@ -13,20 +13,38 @@ export async function GET() {
   }
 
   const user = session.user as any;
+
+  // Fallback: get role and orgId from DB if not in JWT
+  let role = user.role;
+  let orgId = user.organizationId;
+
+  if (!role || !orgId) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true, organizationId: true },
+    });
+    role = role || dbUser?.role;
+    orgId = orgId || dbUser?.organizationId;
+  }
+
   const allowedRoles = ["SUPER_ADMIN", "ADMIN", "DIRECTOR"];
 
-  if (!allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(role)) {
     return NextResponse.json(
       { error: "No autorizado. Solo gerentes y administradores." },
       { status: 403 }
     );
   }
 
+  if (!orgId) {
+    return NextResponse.json({ error: "Sin organización" }, { status: 400 });
+  }
+
   try {
     // Get all users in the same organization
     const employees = await prisma.user.findMany({
       where: {
-        organizationId: user.organizationId,
+        organizationId: orgId,
         isActive: true,
       },
       select: {

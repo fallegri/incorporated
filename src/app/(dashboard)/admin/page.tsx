@@ -1,101 +1,182 @@
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { redirect } from "next/navigation";
 
-export default async function AdminPage() {
+export default async function EquipoAvancePage() {
   const session = await auth();
-  const user = session?.user as any;
+  if (!session?.user) redirect("/login");
+
+  const user = session.user as any;
+
+  // Get user's real orgId and role from DB
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { organizationId: true, role: true },
+  });
+
+  const orgId = user.organizationId || dbUser?.organizationId;
+  const role = user.role || dbUser?.role;
+
+  if (!orgId) redirect("/dashboard");
+
+  // Get all employees with their progress
+  const employees = await prisma.user.findMany({
+    where: { organizationId: orgId, isActive: true },
+    include: {
+      cargo: { include: { area: true } },
+      objetivos: { include: { actividades: true, kpis: true } },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  // Get org stats
+  const docsCount = await prisma.document.count({ where: { organizationId: orgId } });
+  const areasCount = await prisma.area.count({ where: { organizationId: orgId } });
+  const cargosCount = await prisma.cargo.count({ where: { organizationId: orgId } });
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { name: true, aiProvider: true, aiApiKey: true },
+  });
+
+  // Calculate per-employee stats
+  const employeeStats = employees.map((emp) => {
+    const totalAct = emp.objetivos.reduce((sum, o) => sum + o.actividades.length, 0);
+    const doneAct = emp.objetivos.reduce(
+      (sum, o) => sum + o.actividades.filter((a) => a.estado === "terminado" || a.completada).length, 0
+    );
+    const enCursoAct = emp.objetivos.reduce(
+      (sum, o) => sum + o.actividades.filter((a) => a.estado === "en_curso").length, 0
+    );
+    const progress = totalAct > 0 ? Math.round((doneAct / totalAct) * 100) : 0;
+
+    return {
+      id: emp.id,
+      name: emp.name || emp.email,
+      email: emp.email,
+      role: emp.role,
+      cargo: emp.cargo?.name || "Sin cargo",
+      area: emp.cargo?.area?.name || "Sin área",
+      totalObjetivos: emp.objetivos.length,
+      totalActividades: totalAct,
+      actividadesTerminadas: doneAct,
+      actividadesEnCurso: enCursoAct,
+      actividadesPendientes: totalAct - doneAct - enCursoAct,
+      progress,
+      totalKpis: emp.objetivos.reduce((sum, o) => sum + o.kpis.length, 0),
+    };
+  });
+
+  const avgProgress = employeeStats.length > 0
+    ? Math.round(employeeStats.reduce((sum, e) => sum + e.progress, 0) / employeeStats.length)
+    : 0;
 
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h1 className="text-2xl font-bold text-gray-900">⚙️ Administración</h1>
+        <h1 className="text-2xl font-bold text-gray-900">👥 Equipo y Avance</h1>
         <p className="text-gray-600 mt-1">
-          Gestiona la estructura organizacional, cargos y usuarios.
+          Vista gerencial: avance de objetivos y cumplimiento de metas de todos los colaboradores.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Áreas */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">🏢</span>
-            <h3 className="font-semibold text-gray-900">Áreas</h3>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Define la estructura organizacional: áreas, departamentos, direcciones.
-          </p>
-          <p className="text-2xl font-bold text-gray-900">0</p>
-          <p className="text-xs text-gray-500">áreas creadas</p>
+      {/* Org summary */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <p className="text-2xl font-bold text-gray-900">{employees.length}</p>
+          <p className="text-xs text-gray-500">Empleados</p>
         </div>
-
-        {/* Cargos */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">👤</span>
-            <h3 className="font-semibold text-gray-900">Cargos</h3>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Crea y gestiona cargos con descripción, competencias y jerarquía.
-          </p>
-          <p className="text-2xl font-bold text-gray-900">0</p>
-          <p className="text-xs text-gray-500">cargos definidos</p>
+        <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <p className="text-2xl font-bold text-gray-900">{areasCount}</p>
+          <p className="text-xs text-gray-500">Áreas</p>
         </div>
-
-        {/* Usuarios */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">👥</span>
-            <h3 className="font-semibold text-gray-900">Usuarios</h3>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Gestiona usuarios, asigna roles y vincula a cargos.
-          </p>
-          <p className="text-2xl font-bold text-gray-900">1</p>
-          <p className="text-xs text-gray-500">usuarios activos</p>
+        <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <p className="text-2xl font-bold text-gray-900">{cargosCount}</p>
+          <p className="text-xs text-gray-500">Cargos</p>
         </div>
-
-        {/* Documentos */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">📄</span>
-            <h3 className="font-semibold text-gray-900">Documentos</h3>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Documentos organizacionales cargados en el sistema.
-          </p>
-          <p className="text-2xl font-bold text-gray-900">0</p>
-          <p className="text-xs text-gray-500">documentos</p>
+        <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <p className="text-2xl font-bold text-gray-900">{docsCount}</p>
+          <p className="text-xs text-gray-500">Documentos</p>
         </div>
-
-        {/* Configuración IA */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">🤖</span>
-            <h3 className="font-semibold text-gray-900">Proveedor IA</h3>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Configura el proveedor de inteligencia artificial del sistema.
+        <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <p className={`text-2xl font-bold ${avgProgress >= 70 ? "text-green-600" : avgProgress >= 40 ? "text-yellow-600" : "text-red-600"}`}>
+            {avgProgress}%
           </p>
-          <p className="text-sm font-medium text-amber-600">
-            ⚠️ No configurado
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            Configura un proveedor para habilitar IA
-          </p>
+          <p className="text-xs text-gray-500">Avance promedio</p>
         </div>
+      </div>
 
-        {/* Organización */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">🏛️</span>
-            <h3 className="font-semibold text-gray-900">Organización</h3>
+      {/* AI & Config status */}
+      <div className="bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-lg">🤖</span>
+          <div>
+            <p className="text-sm font-medium text-gray-900">
+              Proveedor IA: <span className="capitalize">{org?.aiProvider || "none"}</span>
+            </p>
+            <p className="text-xs text-gray-500">
+              {org?.aiApiKey ? "✅ API Key configurada" : "⚠️ Sin API Key"}
+            </p>
           </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Datos generales de tu organización.
-          </p>
-          <p className="text-sm font-medium text-gray-900">
-            {user?.role || "—"}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">tu rol actual</p>
+        </div>
+        <a href="/admin/configuracion" className="text-sm text-blue-600 hover:text-blue-700">
+          Configurar →
+        </a>
+      </div>
+
+      {/* Employee table */}
+      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div className="p-4 border-b">
+          <h2 className="font-semibold text-gray-900">Avance por Empleado</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium text-gray-700">Empleado</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-700">Cargo</th>
+                <th className="text-center px-4 py-3 font-medium text-gray-700">Obj.</th>
+                <th className="text-center px-4 py-3 font-medium text-gray-700">Tareas</th>
+                <th className="text-center px-4 py-3 font-medium text-gray-700">KPIs</th>
+                <th className="px-4 py-3 font-medium text-gray-700">Avance</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {employeeStats.map((emp) => (
+                <tr key={emp.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{emp.name}</p>
+                    <p className="text-xs text-gray-500">{emp.email}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="text-gray-900">{emp.cargo}</p>
+                    <p className="text-xs text-gray-500">{emp.area}</p>
+                  </td>
+                  <td className="px-4 py-3 text-center font-medium">{emp.totalObjetivos}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="text-green-700">{emp.actividadesTerminadas}</span>
+                    <span className="text-gray-400">/</span>
+                    <span>{emp.totalActividades}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center">{emp.totalKpis}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            emp.progress >= 70 ? "bg-green-500" :
+                            emp.progress >= 40 ? "bg-yellow-500" :
+                            "bg-red-400"
+                          }`}
+                          style={{ width: `${emp.progress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-semibold w-8">{emp.progress}%</span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
