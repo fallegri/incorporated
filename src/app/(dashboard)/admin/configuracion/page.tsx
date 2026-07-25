@@ -125,156 +125,157 @@ export default function ConfiguracionPage() {
 
         <div className="space-y-3">
           {/* Gemini */}
-          <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+          <div className={`border-2 rounded-lg transition-colors ${
             provider === "gemini" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
           }`}>
-            <input
-              type="radio"
-              name="provider"
-              value="gemini"
-              checked={provider === "gemini"}
-              onChange={() => setProvider("gemini")}
-              className="mt-1"
-            />
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">Google Gemini (Cloud)</p>
-              <p className="text-xs text-gray-600 mt-1">
-                Usa la API de Google Gemini. Requiere API key.
-              </p>
-              {provider === "gemini" && (
-                <div className="mt-3 p-3 bg-white border border-blue-200 rounded space-y-2">
+            <label className="flex items-start gap-3 p-4 cursor-pointer">
+              <input
+                type="radio"
+                name="provider"
+                value="gemini"
+                checked={provider === "gemini"}
+                onChange={() => setProvider("gemini")}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-medium text-gray-900">Google Gemini (Cloud)</p>
+                <p className="text-xs text-gray-600 mt-1">Usa la API de Google Gemini. Requiere API key.</p>
+              </div>
+            </label>
+            {provider === "gemini" && (
+              <div className="px-4 pb-4">
+                <div className="p-3 bg-white border border-blue-200 rounded space-y-2">
                   {hasApiKey && (
-                    <p className="text-xs text-green-700">
-                      <strong>API Key guardada:</strong> {maskedKey}
-                    </p>
+                    <p className="text-xs text-green-700"><strong>Key guardada:</strong> {maskedKey}</p>
                   )}
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <p className="text-xs font-medium text-gray-700 mb-1">
                       {hasApiKey ? "Cambiar API Key:" : "API Key:"}
-                    </label>
+                    </p>
                     <input
-                      type="password"
+                      type="text"
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
-                      placeholder={hasApiKey ? "Dejar vacio para mantener la actual" : "Pega tu GOOGLE_GENERATIVE_AI_API_KEY"}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder={hasApiKey ? "Dejar vacio para mantener actual" : "Pega tu API key de Gemini aqui"}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      autoComplete="off"
                     />
                   </div>
                   <p className="text-xs text-gray-500">
-                    Obtener key en{" "}
-                    <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Google AI Studio</a>.
-                    Soporta gemini-2.0-flash.
+                    Obtener en <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Google AI Studio</a>
                   </p>
                 </div>
-              )}
-            </div>
-          </label>
+              </div>
+            )}
+          </div>
 
           {/* NVIDIA NIM */}
-          <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+          <div className={`border-2 rounded-lg transition-colors ${
             provider === "nvidia" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"
           }`}>
-            <input
-              type="radio"
-              name="provider"
-              value="nvidia"
-              checked={provider === "nvidia"}
-              onChange={() => setProvider("nvidia")}
-              className="mt-1"
-            />
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">NVIDIA NIM (Cloud, creditos gratis)</p>
-              <p className="text-xs text-gray-600 mt-1">
-                Usa modelos NVIDIA NIM con creditos gratuitos. Compatible con API OpenAI.
-              </p>
-              {provider === "nvidia" && (
-                <div className="mt-3 p-3 bg-white border border-green-200 rounded space-y-2">
+            <label className="flex items-start gap-3 p-4 cursor-pointer">
+              <input
+                type="radio"
+                name="provider"
+                value="nvidia"
+                checked={provider === "nvidia"}
+                onChange={() => setProvider("nvidia")}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-medium text-gray-900">NVIDIA NIM (Cloud, creditos gratis)</p>
+                <p className="text-xs text-gray-600 mt-1">Modelos NVIDIA con creditos gratuitos. Compatible OpenAI API.</p>
+              </div>
+            </label>
+            {provider === "nvidia" && (
+              <div className="px-4 pb-4">
+                <div className="p-3 bg-white border border-green-200 rounded space-y-2">
                   {hasApiKey && (
-                    <p className="text-xs text-green-700">
-                      <strong>API Key guardada:</strong> {maskedKey}
-                    </p>
+                    <p className="text-xs text-green-700"><strong>Key guardada:</strong> {maskedKey}</p>
                   )}
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <p className="text-xs font-medium text-gray-700 mb-1">
                       {hasApiKey ? "Cambiar API Key:" : "API Key:"}
-                    </label>
+                    </p>
                     <input
-                      type="password"
+                      type="text"
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
-                      placeholder={hasApiKey ? "Dejar vacio para mantener la actual" : "Pega tu NVIDIA_API_KEY"}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder={hasApiKey ? "Dejar vacio para mantener actual" : "Pega tu NVIDIA API key (nvapi-...) aqui"}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
+                      autoComplete="off"
                     />
                   </div>
                   <p className="text-xs text-gray-500">
-                    Obtener key en{" "}
-                    <a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">build.nvidia.com</a>
+                    Obtener en <a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">build.nvidia.com</a> → Buscar modelo → Get API Key
                   </p>
                 </div>
-              )}
-            </div>
-          </label>
+              </div>
+            )}
+          </div>
 
           {/* Ollama */}
-          <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+          <div className={`border-2 rounded-lg transition-colors ${
             provider === "ollama" ? "border-violet-500 bg-violet-50" : "border-gray-200 hover:border-gray-300"
           }`}>
-            <input
-              type="radio"
-              name="provider"
-              value="ollama"
-              checked={provider === "ollama"}
-              onChange={() => setProvider("ollama")}
-              className="mt-1"
-            />
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">Ollama (Local)</p>
-              <p className="text-xs text-gray-600 mt-1">
-                Ejecuta modelos de IA localmente. Los datos nunca salen de tu servidor.
-              </p>
-              {provider === "ollama" && (
-                <div className="mt-3 p-3 bg-white border border-violet-200 rounded space-y-2">
+            <label className="flex items-start gap-3 p-4 cursor-pointer">
+              <input
+                type="radio"
+                name="provider"
+                value="ollama"
+                checked={provider === "ollama"}
+                onChange={() => setProvider("ollama")}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-medium text-gray-900">Ollama (Local)</p>
+                <p className="text-xs text-gray-600 mt-1">Modelos locales. Datos nunca salen de tu servidor.</p>
+              </div>
+            </label>
+            {provider === "ollama" && (
+              <div className="px-4 pb-4">
+                <div className="p-3 bg-white border border-violet-200 rounded space-y-2">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      URL del servidor Ollama:
-                    </label>
+                    <p className="text-xs font-medium text-gray-700 mb-1">URL del servidor Ollama:</p>
                     <input
-                      type="url"
+                      type="text"
                       value={ollamaUrl}
                       onChange={(e) => setOllamaUrl(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
                       placeholder="http://localhost:11434"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white text-gray-900"
+                      autoComplete="off"
                     />
                   </div>
                   <p className="text-xs text-gray-500">
-                    Instala Ollama desde{" "}
-                    <a href="https://ollama.ai" target="_blank" rel="noopener noreferrer" className="text-violet-600 underline">ollama.ai</a>.
-                    Modelo recomendado: llama3.1
+                    Instalar desde <a href="https://ollama.ai" target="_blank" rel="noopener noreferrer" className="text-violet-600 underline">ollama.ai</a>
                   </p>
                 </div>
-              )}
-            </div>
-          </label>
+              </div>
+            )}
+          </div>
 
           {/* None */}
-          <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+          <div className={`border-2 rounded-lg transition-colors ${
             provider === "none" ? "border-gray-500 bg-gray-50" : "border-gray-200 hover:border-gray-300"
           }`}>
-            <input
-              type="radio"
-              name="provider"
-              value="none"
-              checked={provider === "none"}
-              onChange={() => setProvider("none")}
-              className="mt-1"
-            />
-            <div>
-              <p className="font-medium text-gray-900">Sin IA</p>
-              <p className="text-xs text-gray-600 mt-1">
-                El sistema funciona sin inteligencia artificial. Solo analisis por patrones y gestion manual.
-              </p>
-            </div>
-          </label>
+            <label className="flex items-start gap-3 p-4 cursor-pointer">
+              <input
+                type="radio"
+                name="provider"
+                value="none"
+                checked={provider === "none"}
+                onChange={() => setProvider("none")}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-medium text-gray-900">Sin IA</p>
+                <p className="text-xs text-gray-600 mt-1">Solo analisis por patrones y gestion manual.</p>
+              </div>
+            </label>
+          </div>
         </div>
 
         <button
