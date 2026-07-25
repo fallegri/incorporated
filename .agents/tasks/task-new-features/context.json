@@ -1,0 +1,10 @@
+{
+  "project_type": "Next.js 14 App Router full-stack",
+  "language": "TypeScript",
+  "build_system": "pnpm + Next.js + Prisma generate",
+  "test_framework": "No tests configured",
+  "build_command": "echo 'DATABASE_URL=\"postgresql://x:x@localhost:5432/x\"' > .env && echo 'NEXTAUTH_SECRET=\"x\"' >> .env && npx prisma generate && npx next build && rm -f .env",
+  "test_command": "N/A",
+  "verification_instructions": "Run build command to verify all new pages compile",
+  "setup_instructions": "pnpm install (already done)"
+}

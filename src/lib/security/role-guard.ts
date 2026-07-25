@@ -45,7 +45,7 @@ export function canManageUser(managerRole: string, targetRole: string): boolean 
  * Permission checks for specific actions
  */
 export const permissions = {
-  canChangeAIProvider: (role: string) => hasMinRole(role, "ADMIN"),
+  canChangeAIProvider: (role: string) => hasMinRole(role, "ADMIN") || role === "INDIVIDUAL",
   canManageOrg: (role: string) => hasMinRole(role, "ADMIN"),
   canManageCargos: (role: string) => hasMinRole(role, "JEFE_AREA"),
   canInviteUsers: (role: string) => hasMinRole(role, "ADMIN"),

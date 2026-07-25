@@ -1,0 +1,8 @@
+{
+  "task_id": "task-new-features",
+  "task_description": "Implement Glosario, Timeline, and FAQ features for Incorporated",
+  "status": "completed",
+  "feature_order": ["FEAT-002"],
+  "blocked_reason": null,
+  "verification": null
+}

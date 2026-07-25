@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-002",
+  "type": "feature",
+  "description": "Implement Glosario, Timeline, and FAQ pages with API routes, services, and sidebar nav items",
+  "status": "completed",
+  "steps": [
+    "Create glossary extractor service at src/lib/services/glossary-extractor.ts",
+    "Create GET /api/glosario route",
+    "Create /glosario page with searchable term listing",
+    "Create GET /api/timeline route",
+    "Create /timeline page with vertical timeline visualization",
+    "Create GET /api/faq route",
+    "Create /faq page with accordion FAQ display",
+    "Add all three nav items to sidebar.tsx"
+  ],
+  "acceptance_criteria": [
+    "Glossary extractor scans documents rawText for acronyms (2-6 ALL CAPS chars) and terms with definitions",
+    "GET /api/glosario returns terms with definitions and source document info",
+    "Glosario page displays searchable term list with definition and source",
+    "GET /api/timeline returns chronological events based on user creation + plazo_dias",
+    "Timeline page displays vertical timeline with 30/60/90 day markers and rhythms",
+    "GET /api/faq returns pre-built FAQ without AI from user data",
+    "FAQ page displays questions in accordion format",
+    "All three pages appear in sidebar navigation"
+  ],
+  "blocked_reason": null,
+  "findings": "All 3 features implemented and build passes. 11 new files created. Pages: /glosario, /timeline, /faq. API routes: /api/glosario, /api/timeline, /api/faq. Service: glossary-extractor.ts. Sidebar updated with nav items in MI GESTION (timeline) and DOCUMENTOS (glosario, faq) groups."
+}
