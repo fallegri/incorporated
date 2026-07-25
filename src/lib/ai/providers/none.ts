@@ -28,12 +28,12 @@ export class NoAIProvider implements AIProvider {
     yield "Puede buscar información directamente en la sección de Documentos ";
     yield "o consultar con su jefe de área.";
     yield "\n\nPara activar el asistente, un administrador debe configurar ";
-    yield "un proveedor de IA (Gemini o Ollama) en la configuración del sistema.";
+    yield "un proveedor de IA en la seccion de Configuracion del sistema.";
   }
 
   async embed(_text: string): Promise<number[]> {
     throw new AINotAvailableError(
-      "Embeddings no disponibles. Configure un proveedor de IA (Gemini u Ollama) para habilitar la búsqueda semántica en documentos."
+      "Embeddings no disponibles. Configure un proveedor de IA en la seccion de Configuracion para habilitar la busqueda semantica en documentos."
     );
   }
 
@@ -49,7 +49,7 @@ export class NoAIProvider implements AIProvider {
     _context?: RAGContext
   ): Promise<T> {
     throw new AINotAvailableError(
-      "La generación de lineamientos requiere un proveedor de IA activo (Gemini u Ollama). Configure uno en Ajustes → Proveedor IA."
+      "La generacion de lineamientos requiere un proveedor de IA activo. Configure uno en Configuracion → Proveedor IA."
     );
   }
 

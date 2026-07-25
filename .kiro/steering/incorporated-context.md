@@ -14,7 +14,7 @@ Sistema web de inserción laboral y alineamiento estratégico. Ayuda a nuevos co
 - **Deploy:** Vercel + Neon
 
 ## Modos de Operación
-- **Empresa:** Admin/RRHH carga estructura org, docs y asigna usuarios a cargos
+- **Empresa:** Desarrollo Humano carga estructura org, docs y asigna usuarios a cargos
 - **Individual:** Usuario auto-gestiona docs y usa IA para generar lineamientos
 
 ## Modos de IA

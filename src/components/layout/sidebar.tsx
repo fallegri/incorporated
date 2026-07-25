@@ -106,9 +106,16 @@ export function Sidebar({ user }: SidebarProps) {
               )}
               <div className="space-y-0.5">
                 {visibleItems.map((item) => {
-                  const isActive =
-                    pathname === item.href ||
-                    pathname.startsWith(item.href + "/");
+                  // Exact match for parent routes that have child routes
+                  // to prevent both parent and child from highlighting
+                  const hasChildRoutes = visibleItems.some(
+                    (other) => other.href !== item.href && other.href.startsWith(item.href + "/")
+                  ) || navGroups.some((g) =>
+                    g.items.some((other) => other.href !== item.href && other.href.startsWith(item.href + "/"))
+                  );
+                  const isActive = hasChildRoutes
+                    ? pathname === item.href
+                    : pathname === item.href || pathname.startsWith(item.href + "/");
                   return (
                     <Link
                       key={item.href + item.label}

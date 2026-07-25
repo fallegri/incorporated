@@ -1,0 +1,26 @@
+{
+  "id": "FEAT-004",
+  "type": "feature",
+  "description": "Bug fixes (sidebar active state, AI endpoint 404, label update), enterprise onboarding flow, cargo page with real DB data, terminology update to Desarrollo Humano",
+  "status": "in_progress",
+  "steps": [
+    "Fix sidebar active state: exact match for parent routes, startsWith only for child routes",
+    "Fix AI endpoint 404: ensure NvidiaProvider uses correct model name",
+    "Update construir page label from Gemini/Ollama to generic provider text",
+    "Update cargo page to fetch and display real user data from DB",
+    "Add enterprise onboarding flow with role-based tasks",
+    "Replace RRHH/Recursos Humanos/Talento Humano with Desarrollo Humano throughout codebase"
+  ],
+  "acceptance_criteria": [
+    "Clicking Estructura (/admin) does not highlight Configuracion (/admin/configuracion)",
+    "AI lineamientos endpoint uses correct NVIDIA model name that doesn't 404",
+    "Construir page shows 'Con IA (requiere proveedor configurado)' instead of Gemini/Ollama",
+    "Cargo page displays real cargo name, area, reporta_a, role, description, competencias from DB",
+    "Enterprise onboarding guides Desarrollo Humano officer to upload MOF/Organigrama/estructura first",
+    "Enterprise onboarding guides Gerente/Admin to upload PEI/POA/FODA second",
+    "Regular employees see pre-loaded data",
+    "All references to RRHH/Recursos Humanos/Talento Humano replaced with Desarrollo Humano"
+  ],
+  "blocked_reason": null,
+  "findings": null
+}

@@ -3,7 +3,7 @@
 
 ### 1. MISIÓN
 
-Somos una empresa de tecnología e innovación dedicada a desarrollar soluciones digitales que transforman la productividad de las organizaciones latinoamericanas, con talento humano de excelencia y compromiso con la calidad.
+Somos una empresa de tecnologia e innovacion dedicada a desarrollar soluciones digitales que transforman la productividad de las organizaciones latinoamericanas, con un equipo humano de excelencia y compromiso con la calidad.
 
 ### 2. VISIÓN
 
@@ -31,7 +31,7 @@ Al 2028, ser reconocidos como la empresa líder en transformación digital en la
 - Reducir tiempo de entrega de proyectos en un 25%
 - Mantener índice de satisfacción del cliente superior al 90%
 
-#### Eje 3: Desarrollo del Talento Humano
+#### Eje 3: Desarrollo Humano
 - Incrementar la retención del personal clave al 85%
 - Implementar programa de capacitación continua (40h/año por colaborador)
 - Crear plan de carrera para el 100% de los cargos

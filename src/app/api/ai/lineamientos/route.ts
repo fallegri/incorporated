@@ -29,7 +29,7 @@ export async function POST() {
 
     if (!provider.capabilities.structuredOutput) {
       return NextResponse.json(
-        { error: "La generación con IA requiere un proveedor configurado (Gemini u Ollama). Ve a Configuración." },
+        { error: "La generacion con IA requiere un proveedor configurado. Ve a Configuracion para registrar tu API key." },
         { status: 400 }
       );
     }

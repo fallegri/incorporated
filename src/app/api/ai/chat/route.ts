@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     if (!provider.capabilities.chat) {
       return NextResponse.json({
         response:
-          "El asistente IA no está configurado. Contacta al administrador para activar un proveedor (Gemini u Ollama). Mientras tanto, usa el análisis por patrones en 'Construir Lineamientos'.",
+          "El asistente IA no esta configurado. Contacta al administrador para activar un proveedor en Configuracion. Mientras tanto, usa el analisis por patrones en 'Construir Lineamientos'.",
       });
     }
 

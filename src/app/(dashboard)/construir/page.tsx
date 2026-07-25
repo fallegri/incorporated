@@ -229,7 +229,7 @@ export default function ConstruirPage() {
                 <span className="text-xl">🤖</span>
                 <h3 className="font-semibold text-gray-900 mt-1">Con IA</h3>
                 <p className="text-xs text-gray-600 mt-1">Genera lineamientos completos</p>
-                <span className="inline-block mt-2 text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded">Requiere Gemini/Ollama</span>
+                <span className="inline-block mt-2 text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded">Con IA (requiere proveedor configurado)</span>
               </button>
             </div>
 

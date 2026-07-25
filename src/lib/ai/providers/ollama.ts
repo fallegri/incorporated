@@ -139,7 +139,7 @@ export class OllamaProvider implements AIProvider {
   }
 
   private buildSystemPrompt(context?: RAGContext): string {
-    let prompt = `Eres un asistente experto en planificación estratégica y gestión del talento humano. Respondes siempre en español.`;
+    let prompt = `Eres un asistente experto en planificacion estrategica y desarrollo humano. Respondes siempre en espanol.`;
 
     if (context?.cargoInfo) {
       prompt += `\n\nContexto del usuario:\n- Cargo: ${context.cargoInfo.nombre}\n- Área: ${context.cargoInfo.area}`;

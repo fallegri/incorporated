@@ -106,7 +106,7 @@ export class GeminiProvider implements AIProvider {
   }
 
   private buildSystemPrompt(context?: RAGContext): string {
-    let prompt = `Eres un asistente experto en planificación estratégica y gestión del talento humano para la plataforma Incorporated. Respondes siempre en español.`;
+    let prompt = `Eres un asistente experto en planificacion estrategica y desarrollo humano para la plataforma Incorporated. Respondes siempre en espanol.`;
 
     if (context?.cargoInfo) {
       prompt += `\n\nContexto del usuario:\n- Cargo: ${context.cargoInfo.nombre}\n- Área: ${context.cargoInfo.area}\n- Descripción: ${context.cargoInfo.descripcion}`;

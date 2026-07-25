@@ -50,7 +50,7 @@ El sistema incorpora inteligencia artificial híbrida (cloud, local o sin IA) pa
 
 ### 2.1 Modos de Operación
 
-- **Modo Empresa:** Admin/RRHH carga estructura organizacional, documentos y asigna usuarios a cargos
+- **Modo Empresa:** Desarrollo Humano carga estructura organizacional, documentos y asigna usuarios a cargos
 - **Modo Individual:** El usuario sube sus propios documentos y la IA genera lineamientos
 
 ### 2.2 Modos de IA

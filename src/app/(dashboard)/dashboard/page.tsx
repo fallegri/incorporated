@@ -40,6 +40,30 @@ export default async function DashboardPage() {
 
   const hasData = objetivos.length > 0;
 
+  // Check enterprise mode and docs status for onboarding
+  let isEnterprise = false;
+  let hasMOF = false;
+  let hasPEI = false;
+
+  if (user?.organizationId) {
+    try {
+      const org = await prisma.organization.findUnique({
+        where: { id: user.organizationId },
+        select: { mode: true },
+      });
+      isEnterprise = org?.mode === "enterprise";
+
+      if (isEnterprise) {
+        const docTypes = await prisma.document.findMany({
+          where: { organizationId: user.organizationId, rawText: { not: null } },
+          select: { type: true },
+        });
+        hasMOF = docTypes.some((d) => d.type === "MOF");
+        hasPEI = docTypes.some((d) => d.type === "PEI");
+      }
+    } catch {}
+  }
+
   // Serialize data for client component
   const serializedObjetivos = objetivos.map((obj) => ({
     id: obj.id,
@@ -83,6 +107,9 @@ export default async function DashboardPage() {
       docsCount={docsCount}
       hasData={hasData}
       userRole={user?.role || "COLABORADOR"}
+      isEnterprise={isEnterprise}
+      hasMOF={hasMOF}
+      hasPEI={hasPEI}
     />
   );
 }

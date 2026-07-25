@@ -19,7 +19,7 @@ Gerencia General
 │   ├── Jefatura de Ventas
 │   ├── Jefatura de Marketing Digital
 │   └── Ejecutivos de Cuenta
-├── Dirección de Talento Humano
+├── Direccion de Desarrollo Humano
 │   ├── Jefatura de Reclutamiento
 │   ├── Jefatura de Desarrollo Organizacional
 │   └── Analista de Bienestar
@@ -104,7 +104,7 @@ Diseñar y ejecutar la estrategia de marketing digital que posicione a TechNova 
 
 #### CARGO: Analista de Desarrollo Organizacional
 
-**Reporta a:** Director de Talento Humano
+**Reporta a:** Director de Desarrollo Humano
 **Supervisa a:** No aplica (cargo individual contributor)
 
 **Misión del cargo:**
@@ -121,7 +121,7 @@ Diseñar e implementar programas de desarrollo organizacional que fortalezcan la
 - Mantener actualizado el Manual de Organización y Funciones
 
 **Competencias requeridas:**
-- Gestión del talento humano
+- Desarrollo humano y organizacional
 - Diseño instruccional y facilitación
 - Análisis organizacional
 - Comunicación interpersonal

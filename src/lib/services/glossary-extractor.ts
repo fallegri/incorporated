@@ -36,7 +36,7 @@ const KNOWN_ACRONYMS: Record<string, string> = {
   CMI: "Cuadro de Mando Integral",
   KPI: "Key Performance Indicator / Indicador Clave de Desempeño",
   OKR: "Objectives and Key Results / Objetivos y Resultados Clave",
-  RRHH: "Recursos Humanos",
+  RRHH: "Desarrollo Humano",
   TIC: "Tecnologias de la Informacion y Comunicacion",
   ICM: "Indice de Control de Metas",
   POA: "Plan Operativo Anual",

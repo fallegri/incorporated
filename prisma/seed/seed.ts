@@ -47,7 +47,7 @@ async function main() {
     data: { name: "Dirección Comercial", organizationId: orgEmpresa.id },
   });
   const areaRRHH = await prisma.area.create({
-    data: { name: "Dirección de Talento Humano", organizationId: orgEmpresa.id },
+    data: { name: "Direccion de Desarrollo Humano", organizationId: orgEmpresa.id },
   });
   const areaAdmin = await prisma.area.create({
     data: { name: "Dirección de Administración y Finanzas", organizationId: orgEmpresa.id },
@@ -89,7 +89,7 @@ async function main() {
       name: "Analista de Desarrollo Organizacional",
       description: "Diseñar programas de desarrollo organizacional que fortalezcan cultura y desempeño.",
       competencias: ["Gestión del talento", "Diseño instruccional", "Análisis organizacional", "Comunicación"],
-      reportsTo: "Director de Talento Humano",
+      reportsTo: "Director de Desarrollo Humano",
       organizationId: orgEmpresa.id,
       areaId: areaRRHH.id,
     },
@@ -143,8 +143,8 @@ async function main() {
 
   const userAnalista = await prisma.user.create({
     data: {
-      email: "analista.rrhh@technova.com",
-      name: "María López",
+      email: "analista.dh@technova.com",
+      name: "Maria Lopez",
       passwordHash,
       role: "COLABORADOR",
       organizationId: orgEmpresa.id,
@@ -158,6 +158,7 @@ async function main() {
     { file: "foda-empresa.md", name: "FODA TechNova 2024", type: "FODA" },
     { file: "mof-empresa.md", name: "MOF TechNova 2024", type: "MOF" },
     { file: "poa-empresa.md", name: "POA TechNova 2024", type: "POI" },
+    { file: "organigrama-empresa.md", name: "Organigrama TechNova 2024", type: "OTRO" },
   ];
 
   for (const doc of docs) {
@@ -179,7 +180,7 @@ async function main() {
   console.log("  ✅ 4 Areas + 2 Sub-areas");
   console.log("  ✅ 4 Cargos");
   console.log("  ✅ 4 Users");
-  console.log("  ✅ 4 Documents (PEI, FODA, MOF, POA)");
+  console.log("  ✅ 5 Documents (PEI, FODA, MOF, POA, Organigrama)");
 
   // ============================================================
   // 2. MODO INDIVIDUAL — Freelance
@@ -266,7 +267,7 @@ Ayudar a empresas medianas a adoptar tecnología de forma efectiva.
   console.log("  ├─ admin@technova.com        → ADMIN (Gerente General)");
   console.log("  ├─ jefe.dev@technova.com     → JEFE_AREA (Jefe Desarrollo)");
   console.log("  ├─ jefe.marketing@technova.com → JEFE_AREA (Jefe Marketing)");
-  console.log("  └─ analista.rrhh@technova.com → COLABORADOR (Analista RRHH)");
+  console.log("  ├─ analista.dh@technova.com   → COLABORADOR (Analista Desarrollo Humano)");
   console.log("");
   console.log("  MODO INDIVIDUAL:");
   console.log("  └─ diego@freelance.com       → INDIVIDUAL (Freelance)");

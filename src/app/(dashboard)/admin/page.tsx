@@ -79,7 +79,7 @@ export default async function AdminPage() {
             ⚠️ No configurado
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Configura Gemini u Ollama para habilitar IA
+            Configura un proveedor para habilitar IA
           </p>
         </div>
 

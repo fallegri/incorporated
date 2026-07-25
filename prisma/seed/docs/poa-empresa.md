@@ -27,7 +27,7 @@
 
 #### OO-03: Fortalecer el equipo humano
 - Meta: Retención ≥ 85%, satisfacción ≥ 80%
-- Responsable: Director de Talento Humano
+- Responsable: Director de Desarrollo Humano
 - Actividades:
   · Implementar programa de onboarding estandarizado (Q1)
   · Lanzar academia interna con 12 cursos anuales (Q1)
@@ -64,13 +64,13 @@
 |-----------|-------------|----|----|----|----|
 | CRM automatizado | Comercial | ✓ | | | |
 | DevOps completo | Tecnología | ✓ | | | |
-| Onboarding estandarizado | RRHH | ✓ | | | |
+| Onboarding estandarizado | Desarrollo Humano | ✓ | | | |
 | Apertura Colombia | Comercial | | ✓ | | |
-| Academia interna | RRHH | ✓ | ✓ | ✓ | ✓ |
+| Academia interna | Desarrollo Humano | ✓ | ✓ | ✓ | ✓ |
 | Desarrollo MVP SaaS | Tecnología | | ✓ | ✓ | |
-| Evaluación 360° | RRHH | | ✓ | | ✓ |
+| Evaluación 360° | Desarrollo Humano | | ✓ | | ✓ |
 | Beta testing producto | Comercial | | | ✓ | |
-| Revisión salarial | RRHH | | | ✓ | |
+| Revisión salarial | Desarrollo Humano | | | ✓ | |
 | Lanzamiento producto | Todos | | | | ✓ |
 
 ### 3. PRESUPUESTO OPERATIVO 2024
@@ -78,7 +78,7 @@
 | Área | Presupuesto | % del Total |
 |------|-------------|-------------|
 | Tecnología (infra + herramientas) | $180,000 | 35% |
-| Talento Humano (capacitación + bienestar) | $95,000 | 18% |
+| Desarrollo Humano (capacitacion + bienestar) | $95,000 | 18% |
 | Comercial (marketing + eventos) | $120,000 | 23% |
 | Administración (operaciones) | $65,000 | 12% |
 | I+D (producto SaaS) | $60,000 | 12% |

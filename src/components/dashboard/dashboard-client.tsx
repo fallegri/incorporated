@@ -40,6 +40,9 @@ interface Props {
   docsCount: number;
   hasData: boolean;
   userRole: string;
+  isEnterprise?: boolean;
+  hasMOF?: boolean;
+  hasPEI?: boolean;
 }
 
 type ExpandedSection = "objetivos" | "tareas" | null;
@@ -52,6 +55,9 @@ export function DashboardClient({
   docsCount,
   hasData,
   userRole,
+  isEnterprise = false,
+  hasMOF = false,
+  hasPEI = false,
 }: Props) {
   const [expandedSection, setExpandedSection] = useState<ExpandedSection>(null);
   const [actividades, setActividades] = useState(initialActividades);
@@ -419,8 +425,97 @@ export function DashboardClient({
             </div>
           )}
 
-          {/* Onboarding if empty */}
-          {!hasData && (
+          {/* Enterprise onboarding based on role */}
+          {!hasData && isEnterprise && (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">
+                Onboarding Empresarial
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                La configuracion de la empresa sigue un orden por roles:
+              </p>
+              <div className="space-y-3 mt-4">
+                {/* Step 1: Desarrollo Humano */}
+                <div className={`flex items-center gap-4 p-3 border rounded-lg ${
+                  !hasMOF && (userRole === "ADMIN" || userRole === "SUPER_ADMIN" || userRole === "DIRECTOR")
+                    ? "bg-purple-50 border-purple-200"
+                    : hasMOF ? "bg-green-50 border-green-200" : ""
+                }`}>
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    hasMOF ? "bg-green-600 text-white" : "bg-purple-600 text-white"
+                  }`}>
+                    {hasMOF ? "\u2713" : "1"}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      Desarrollo Humano: Cargar documentos administrativos
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      MOF, Organigrama, Estructura organizacional, Reglamento interno
+                    </p>
+                  </div>
+                  {!hasMOF && (
+                    <Link href="/documentos" className="text-sm text-purple-600 font-medium">
+                      Cargar
+                    </Link>
+                  )}
+                </div>
+
+                {/* Step 2: Gerente/Admin */}
+                <div className={`flex items-center gap-4 p-3 border rounded-lg ${
+                  hasMOF && !hasPEI && (userRole === "ADMIN" || userRole === "SUPER_ADMIN" || userRole === "DIRECTOR")
+                    ? "bg-blue-50 border-blue-200"
+                    : hasPEI ? "bg-green-50 border-green-200" : ""
+                }`}>
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    hasPEI ? "bg-green-600 text-white" : hasMOF ? "bg-blue-600 text-white" : "bg-gray-300 text-white"
+                  }`}>
+                    {hasPEI ? "\u2713" : "2"}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      Gerente/Administrador: Cargar lineamientos estrategicos
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      PEI, POA, FODA, Presupuesto operativo
+                    </p>
+                  </div>
+                  {hasMOF && !hasPEI && (
+                    <Link href="/documentos" className="text-sm text-blue-600 font-medium">
+                      Cargar
+                    </Link>
+                  )}
+                </div>
+
+                {/* Step 3: Colaborador */}
+                <div className={`flex items-center gap-4 p-3 border rounded-lg ${
+                  hasMOF && hasPEI ? "bg-green-50 border-green-200" : ""
+                }`}>
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    hasMOF && hasPEI ? "bg-green-600 text-white" : "bg-gray-200 text-gray-500"
+                  }`}>
+                    {hasMOF && hasPEI ? "\u2713" : "3"}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      Colaborador: Datos pre-cargados listos
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Construir lineamientos con IA usando los documentos cargados
+                    </p>
+                  </div>
+                  {hasMOF && hasPEI && (
+                    <Link href="/construir" className="text-sm text-green-600 font-medium">
+                      Construir
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Individual mode onboarding if empty */}
+          {!hasData && !isEnterprise && (
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-2">
                 Comencemos - 3 pasos
@@ -470,7 +565,7 @@ export function DashboardClient({
                       Configura IA (opcional)
                     </p>
                     <p className="text-xs text-gray-500">
-                      Conecta Gemini Pro para analisis avanzado
+                      Conecta un proveedor de IA para analisis avanzado
                     </p>
                   </div>
                   <Link
