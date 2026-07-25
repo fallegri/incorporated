@@ -132,9 +132,24 @@ export class NvidiaProvider implements AIProvider {
     context?: RAGContext
   ): Promise<T> {
     const systemPrompt = this.buildSystemPrompt(context) +
-      "\n\nResponde SOLO con JSON válido. No incluyas texto antes ni después del JSON.";
+      `\n\nIMPORTANTE: Responde UNICAMENTE con JSON válido. Tu respuesta debe ser SOLO un objeto JSON con esta estructura exacta:
+{
+  "objetivos": [
+    {
+      "titulo": "string",
+      "descripcion": "string",
+      "tipo": "estratégico",
+      "alineamiento_pei": "string",
+      "kpis": [{ "nombre": "string", "metrica": "string", "meta": "string", "frecuencia": "trimestral" }],
+      "actividades": [{ "descripcion": "string", "plazo_dias": "30", "prioridad": "alta" }]
+    }
+  ],
+  "plan_insercion": { "dia_30": ["string"], "dia_60": ["string"], "dia_90": ["string"] },
+  "documentos_sugeridos": ["string"],
+  "observaciones": "string"
+}
+No agregues texto antes ni después del JSON. No uses markdown. Solo JSON puro.`;
 
-    // Use direct fetch (confirmed working) instead of AI SDK (causes 404 on NVIDIA)
     const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -148,7 +163,7 @@ export class NvidiaProvider implements AIProvider {
           { role: "user", content: prompt },
         ],
         max_tokens: 4096,
-        temperature: 0.7,
+        temperature: 0.3,
       }),
     });
 
@@ -162,14 +177,67 @@ export class NvidiaProvider implements AIProvider {
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content || "";
 
-    // Extract JSON from response (in case model adds text around it)
+    // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error("La IA no generó JSON válido. Intenta de nuevo.");
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
-    return schema.parse(parsed);
+    try {
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      // Fill defaults for missing fields (model may not generate all)
+      const normalized = {
+        objetivos: parsed.objetivos || parsed.objectives || [],
+        plan_insercion: parsed.plan_insercion || parsed.plan || { dia_30: [], dia_60: [], dia_90: [] },
+        documentos_sugeridos: parsed.documentos_sugeridos || parsed.documentos || [],
+        observaciones: parsed.observaciones || parsed.notas || "Generado por IA — revisa y ajusta según tu criterio.",
+      };
+
+      // Normalize objetivos
+      if (normalized.objetivos.length > 0) {
+        normalized.objetivos = normalized.objetivos.map((obj: any) => ({
+          titulo: obj.titulo || obj.title || "Objetivo",
+          descripcion: obj.descripcion || obj.description || "",
+          tipo: obj.tipo === "operativo" ? "operativo" : "estratégico",
+          alineamiento_pei: obj.alineamiento_pei || obj.alineamiento || "Por definir",
+          kpis: (obj.kpis || []).slice(0, 3).map((k: any) => ({
+            nombre: k.nombre || k.name || "KPI",
+            metrica: k.metrica || k.metric || "",
+            meta: k.meta || k.target || "Por definir",
+            frecuencia: k.frecuencia || "trimestral",
+          })),
+          actividades: (obj.actividades || obj.activities || []).slice(0, 5).map((a: any) => ({
+            descripcion: a.descripcion || a.description || "Actividad",
+            plazo_dias: ["30", "60", "90"].includes(String(a.plazo_dias || a.plazo)) ? String(a.plazo_dias || a.plazo) : "60",
+            prioridad: ["alta", "media", "baja"].includes(a.prioridad || a.priority) ? (a.prioridad || a.priority) : "media",
+          })),
+        }));
+      }
+
+      return schema.parse(normalized);
+    } catch (parseError: any) {
+      // If Zod validation fails, return a minimal valid response
+      const fallback = {
+        objetivos: [{
+          titulo: "Objetivo generado por IA (revisar)",
+          descripcion: text.slice(0, 200),
+          tipo: "estratégico" as const,
+          alineamiento_pei: "Por definir",
+          kpis: [{ nombre: "KPI por definir", metrica: "Por definir", meta: "Por definir", frecuencia: "trimestral" as const }],
+          actividades: [{ descripcion: "Revisar respuesta de IA y definir actividades", plazo_dias: "30" as const, prioridad: "alta" as const }],
+        }],
+        plan_insercion: { dia_30: ["Revisar lineamientos generados"], dia_60: ["Ajustar objetivos"], dia_90: ["Evaluar avance"] },
+        documentos_sugeridos: ["PEI", "POA"],
+        observaciones: "La IA generó una respuesta parcial. Revisa y completa manualmente.",
+      };
+
+      try {
+        return schema.parse(fallback) as T;
+      } catch {
+        throw new Error("Error al procesar respuesta de IA: " + parseError.message?.slice(0, 200));
+      }
+    }
   }
 
   async isAvailable(): Promise<boolean> {
