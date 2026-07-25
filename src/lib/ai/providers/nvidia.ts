@@ -38,10 +38,12 @@ export class NvidiaProvider implements AIProvider {
   }
 
   private get model() {
-    return this.client("nvidia/llama-3.1-nemotron-70b-instruct");
+    // meta/llama-3.3-70b-instruct — best available for structured generation
+    return this.client("meta/llama-3.3-70b-instruct");
   }
 
   private get chatModel() {
+    // meta/llama-3.1-8b-instruct — fast for conversational chat
     return this.client("meta/llama-3.1-8b-instruct");
   }
 

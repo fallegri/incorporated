@@ -1,7 +1,7 @@
 {
   "task_id": "task-bugfixes-and-features",
   "task_description": "Fix sidebar active state, AI endpoint 404, update labels, add enterprise onboarding flow, cargo page with real data, terminology update",
-  "status": "in_progress",
+  "status": "completed",
   "feature_order": ["FEAT-004"],
   "blocked_reason": null,
   "verification": null

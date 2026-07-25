@@ -2,7 +2,7 @@
   "id": "FEAT-004",
   "type": "feature",
   "description": "Bug fixes (sidebar active state, AI endpoint 404, label update), enterprise onboarding flow, cargo page with real DB data, terminology update to Desarrollo Humano",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Fix sidebar active state: exact match for parent routes, startsWith only for child routes",
     "Fix AI endpoint 404: ensure NvidiaProvider uses correct model name",
@@ -22,5 +22,5 @@
     "All references to RRHH/Recursos Humanos/Talento Humano replaced with Desarrollo Humano"
   ],
   "blocked_reason": null,
-  "findings": null
+  "findings": "All changes implemented and build passes. 19 files modified, 1 new file (organigrama-empresa.md). Sidebar fix uses dynamic detection of parent/child routes. NVIDIA model changed to llama-3.1-nemotron-70b-instruct. Cargo page now fetches real data via Prisma include with cargo+area relations. Enterprise onboarding shown in dashboard and cargo page with 3-step role-based flow. Terminology updated in providers, seed data, docs, and glossary."
 }
