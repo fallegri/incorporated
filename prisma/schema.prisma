@@ -18,6 +18,7 @@ enum AppMode {
 
 enum AIProvider {
   gemini
+  nvidia
   ollama
   none
 }

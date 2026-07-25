@@ -135,6 +135,35 @@ export default function ConfiguracionPage() {
             </div>
           </label>
 
+          {/* NVIDIA NIM */}
+          <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+            provider === "nvidia" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"
+          }`}>
+            <input
+              type="radio"
+              name="provider"
+              value="nvidia"
+              checked={provider === "nvidia"}
+              onChange={() => setProvider("nvidia")}
+              className="mt-1"
+            />
+            <div>
+              <p className="font-medium text-gray-900">🟢 NVIDIA NIM (Cloud, créditos gratis)</p>
+              <p className="text-xs text-gray-600 mt-1">
+                Usa modelos NVIDIA NIM con créditos gratuitos. Compatible con API OpenAI.
+              </p>
+              {provider === "nvidia" && (
+                <div className="mt-3 p-3 bg-white border border-green-200 rounded">
+                  <p className="text-xs text-gray-500">
+                    Configura en variables de entorno:<br/>
+                    <code className="bg-gray-100 px-1">NVIDIA_API_KEY</code> = tu API key de{" "}
+                    <a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">build.nvidia.com</a>
+                  </p>
+                </div>
+              )}
+            </div>
+          </label>
+
           {/* Ollama */}
           <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
             provider === "ollama" ? "border-violet-500 bg-violet-50" : "border-gray-200 hover:border-gray-300"

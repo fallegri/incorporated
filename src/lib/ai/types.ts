@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type AIProviderName = "gemini" | "ollama" | "none";
+export type AIProviderName = "gemini" | "nvidia" | "ollama" | "none";
 
 export interface AICapabilities {
   chat: boolean;

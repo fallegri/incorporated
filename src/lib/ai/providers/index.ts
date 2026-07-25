@@ -1,5 +1,6 @@
 import { AIProvider, AIProviderName } from "../types";
 import { GeminiProvider } from "./gemini";
+import { NvidiaProvider } from "./nvidia";
 import { OllamaProvider } from "./ollama";
 import { NoAIProvider } from "./none";
 
@@ -14,6 +15,8 @@ export function createAIProvider(providerName?: AIProviderName): AIProvider {
   switch (name) {
     case "gemini":
       return new GeminiProvider();
+    case "nvidia":
+      return new NvidiaProvider();
     case "ollama":
       return new OllamaProvider();
     case "none":
@@ -23,5 +26,6 @@ export function createAIProvider(providerName?: AIProviderName): AIProvider {
 }
 
 export { GeminiProvider } from "./gemini";
+export { NvidiaProvider } from "./nvidia";
 export { OllamaProvider } from "./ollama";
 export { NoAIProvider } from "./none";

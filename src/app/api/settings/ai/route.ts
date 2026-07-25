@@ -55,7 +55,7 @@ export async function PUT(request: NextRequest) {
   try {
     const { provider } = await request.json();
 
-    if (!["gemini", "ollama", "none"].includes(provider)) {
+    if (!["gemini", "nvidia", "ollama", "none"].includes(provider)) {
       return NextResponse.json({ error: "Provider inválido" }, { status: 400 });
     }
 
