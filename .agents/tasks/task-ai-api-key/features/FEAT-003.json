@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "feature",
   "description": "Per-organization AI API key storage - users can paste their own API key in the config page instead of using Vercel env vars",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Add aiApiKey and ollamaUrl fields to Organization model in Prisma schema",
     "Update GET /api/settings/ai to return hasApiKey (boolean) based on org DB field",
@@ -25,5 +25,5 @@
     "API key is never exposed in GET responses or logs"
   ],
   "blocked_reason": null,
-  "findings": null
+  "findings": "All changes implemented and build passes. Schema pushed to Neon DB. 9 files modified: Prisma schema, settings API (GET/PUT), config page with password/url inputs, AI provider factory, GeminiProvider, NvidiaProvider, OllamaProvider, lineamientos route, chat route. createGoogleGenerativeAI imported from @ai-sdk/google for custom key support."
 }
