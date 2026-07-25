@@ -397,9 +397,51 @@ export default function ConstruirPage() {
             <div key={i} className="border rounded-lg p-4">
               <h3 className="font-semibold text-gray-900">{i + 1}. {obj.titulo}</h3>
               <p className="text-sm text-gray-600 mt-1">{obj.descripcion}</p>
+              {obj.kpis?.length > 0 && (
+                <div className="mt-2 pl-3 border-l-2 border-green-200">
+                  {obj.kpis.map((kpi: any, j: number) => (
+                    <p key={j} className="text-xs text-gray-600">📈 {kpi.nombre}: {kpi.meta}</p>
+                  ))}
+                </div>
+              )}
+              {obj.actividades?.length > 0 && (
+                <div className="mt-2 pl-3 border-l-2 border-blue-200">
+                  {obj.actividades.map((act: any, j: number) => (
+                    <p key={j} className="text-xs text-gray-600">
+                      <span className={`inline-block w-8 text-center mr-1 rounded text-[10px] ${
+                        act.plazo_dias === "30" ? "bg-green-100 text-green-700" :
+                        act.plazo_dias === "60" ? "bg-yellow-100 text-yellow-700" :
+                        "bg-red-100 text-red-700"
+                      }`}>{act.plazo_dias}d</span>
+                      {act.descripcion}
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
-          <button className="w-full bg-violet-600 text-white font-medium py-3 rounded-md hover:bg-violet-700 transition-colors">✅ Confirmar</button>
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/docs/analyze/save", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ objetivos: result.objetivos, kpis: [] }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  alert("✅ " + data.message);
+                } else {
+                  alert(data.error || "Error al guardar");
+                }
+              } catch {
+                alert("Error de conexión");
+              }
+            }}
+            className="w-full bg-violet-600 text-white font-medium py-3 rounded-md hover:bg-violet-700 transition-colors"
+          >
+            💾 Guardar como mis lineamientos
+          </button>
         </div>
       )}
     </div>
