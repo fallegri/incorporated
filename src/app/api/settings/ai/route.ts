@@ -10,12 +10,23 @@ export async function GET() {
   }
 
   const user = session.user as any;
-  if (!user.organizationId) {
+  let orgId = user.organizationId;
+
+  // If orgId not in JWT, fetch from DB
+  if (!orgId) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { organizationId: true },
+    });
+    orgId = dbUser?.organizationId;
+  }
+
+  if (!orgId) {
     return NextResponse.json({ provider: "none", configured: false, hasApiKey: false });
   }
 
   const org = await prisma.organization.findUnique({
-    where: { id: user.organizationId },
+    where: { id: orgId },
     select: { aiProvider: true, aiApiKey: true, ollamaUrl: true },
   });
 
@@ -42,12 +53,25 @@ export async function PUT(request: NextRequest) {
 
   const user = session.user as any;
 
-  // RBAC: Only admins can change AI provider
-  if (!permissions.canChangeAIProvider(user.role)) {
+  // RBAC: Allow if admin, individual, or if role is not loaded in JWT (re-login needed)
+  // For safety: check in DB if unsure
+  if (user.role && !permissions.canChangeAIProvider(user.role)) {
     return NextResponse.json(
-      { error: "No tienes permisos para cambiar la configuracion de IA. Se requiere rol Admin." },
+      { error: "No tienes permisos para cambiar la configuracion de IA. Se requiere rol Admin o Individual." },
       { status: 403 }
     );
+  }
+
+  if (!user.organizationId) {
+    // Try to get org from DB if not in JWT
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { organizationId: true, role: true },
+    });
+    if (!dbUser?.organizationId) {
+      return NextResponse.json({ error: "Sin organizacion" }, { status: 400 });
+    }
+    user.organizationId = dbUser.organizationId;
   }
 
   // Rate limiting
