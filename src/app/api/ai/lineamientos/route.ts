@@ -16,15 +16,47 @@ export async function POST() {
 
   try {
     // Read org AI settings from database
+    let orgId = user.organizationId;
+
+    // Fallback: if orgId not in JWT, fetch from DB
+    if (!orgId) {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { organizationId: true },
+      });
+      orgId = dbUser?.organizationId;
+    }
+
+    if (!orgId) {
+      return NextResponse.json(
+        { error: "Sin organización. Cierra sesión y vuelve a ingresar." },
+        { status: 400 }
+      );
+    }
+
     const org = await prisma.organization.findUnique({
-      where: { id: user.organizationId },
+      where: { id: orgId },
       select: { aiProvider: true, aiApiKey: true, ollamaUrl: true },
     });
 
+    if (!org) {
+      return NextResponse.json(
+        { error: "Organización no encontrada." },
+        { status: 400 }
+      );
+    }
+
+    if (!org.aiApiKey && org.aiProvider !== "none" && org.aiProvider !== "ollama") {
+      return NextResponse.json(
+        { error: "API Key no configurada. Ve a Configuración para registrar tu key de " + org.aiProvider + "." },
+        { status: 400 }
+      );
+    }
+
     const provider = createAIProvider(
-      org?.aiProvider as any,
-      org?.aiApiKey || undefined,
-      org?.ollamaUrl || undefined
+      org.aiProvider as any,
+      org.aiApiKey || undefined,
+      org.ollamaUrl || undefined
     );
 
     if (!provider.capabilities.structuredOutput) {

@@ -48,20 +48,34 @@ export class NvidiaProvider implements AIProvider {
 
   async *chat(messages: ChatMessage[], context?: RAGContext): AsyncIterable<string> {
     const systemPrompt = this.buildSystemPrompt(context);
-    const aiMessages = messages.map((m) => ({
-      role: m.role as "user" | "assistant" | "system",
-      content: m.content,
-    }));
+    const allMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages.map((m) => ({ role: m.role, content: m.content })),
+    ];
 
-    const result = streamText({
-      model: this.chatModel,
-      system: systemPrompt,
-      messages: aiMessages,
+    // Direct fetch for streaming (AI SDK causes 404 on NVIDIA)
+    const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.resolvedApiKey}`,
+      },
+      body: JSON.stringify({
+        model: "meta/llama-3.1-8b-instruct",
+        messages: allMessages,
+        max_tokens: 2048,
+        stream: false,
+      }),
     });
 
-    for await (const chunk of result.textStream) {
-      yield chunk;
+    if (!response.ok) {
+      yield "Error al conectar con NVIDIA IA. Verifica tu API key.";
+      return;
     }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "Sin respuesta";
+    yield content;
   }
 
   async embed(text: string): Promise<number[]> {
@@ -117,15 +131,44 @@ export class NvidiaProvider implements AIProvider {
     schema: z.ZodType<T>,
     context?: RAGContext
   ): Promise<T> {
-    const systemPrompt = this.buildSystemPrompt(context);
+    const systemPrompt = this.buildSystemPrompt(context) +
+      "\n\nResponde SOLO con JSON válido. No incluyas texto antes ni después del JSON.";
 
-    const { text } = await generateText({
-      model: this.model,
-      system: systemPrompt + "\n\nResponde SOLO con JSON válido según el schema solicitado.",
-      prompt,
+    // Use direct fetch (confirmed working) instead of AI SDK (causes 404 on NVIDIA)
+    const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.resolvedApiKey}`,
+      },
+      body: JSON.stringify({
+        model: "meta/llama-3.1-8b-instruct",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt },
+        ],
+        max_tokens: 4096,
+        temperature: 0.7,
+      }),
     });
 
-    const parsed = JSON.parse(text);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new AINotAvailableError(
+        `NVIDIA API error (${response.status}): ${errText.slice(0, 200)}`
+      );
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || "";
+
+    // Extract JSON from response (in case model adds text around it)
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("La IA no generó JSON válido. Intenta de nuevo.");
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]);
     return schema.parse(parsed);
   }
 
