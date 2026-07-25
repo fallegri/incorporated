@@ -1,0 +1,29 @@
+{
+  "id": "FEAT-003",
+  "type": "feature",
+  "description": "Per-organization AI API key storage - users can paste their own API key in the config page instead of using Vercel env vars",
+  "status": "in_progress",
+  "steps": [
+    "Add aiApiKey and ollamaUrl fields to Organization model in Prisma schema",
+    "Update GET /api/settings/ai to return hasApiKey (boolean) based on org DB field",
+    "Update PUT /api/settings/ai to accept and save apiKey and ollamaUrl",
+    "Update config page to show password input for API key and URL input for Ollama",
+    "Update createAIProvider factory to accept optional apiKey parameter",
+    "Update GeminiProvider and NvidiaProvider constructors to accept apiKey",
+    "Update OllamaProvider to accept custom baseUrl",
+    "Update AI API routes (lineamientos, chat) to read org key from DB and pass to provider"
+  ],
+  "acceptance_criteria": [
+    "Organization model has aiApiKey (String?) and ollamaUrl (String?) fields",
+    "GET /api/settings/ai returns hasApiKey boolean without exposing actual key",
+    "PUT /api/settings/ai saves apiKey to org.aiApiKey in DB",
+    "Config page shows masked key (****last4) when key exists",
+    "Config page has password input for Gemini/NVIDIA and URL input for Ollama",
+    "createAIProvider accepts optional apiKey and ollamaUrl parameters",
+    "Providers use passed apiKey or fall back to process.env",
+    "AI routes read org settings from DB and pass to createAIProvider",
+    "API key is never exposed in GET responses or logs"
+  ],
+  "blocked_reason": null,
+  "findings": null
+}

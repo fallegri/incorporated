@@ -7,7 +7,6 @@ import {
   AINotAvailableError,
 } from "../types";
 
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.1";
 const OLLAMA_EMBED_MODEL = "nomic-embed-text";
 
@@ -22,6 +21,12 @@ export class OllamaProvider implements AIProvider {
     embeddingDimensions: 768,
   };
 
+  private baseUrl: string;
+
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl || process.env.OLLAMA_BASE_URL || "http://localhost:11434";
+  }
+
   async *chat(messages: ChatMessage[], context?: RAGContext): AsyncIterable<string> {
     const systemPrompt = this.buildSystemPrompt(context);
     const ollamaMessages = [
@@ -29,7 +34,7 @@ export class OllamaProvider implements AIProvider {
       ...messages.map((m) => ({ role: m.role, content: m.content })),
     ];
 
-    const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    const response = await fetch(`${this.baseUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -67,7 +72,7 @@ export class OllamaProvider implements AIProvider {
   }
 
   async embed(text: string): Promise<number[]> {
-    const response = await fetch(`${OLLAMA_BASE_URL}/api/embed`, {
+    const response = await fetch(`${this.baseUrl}/api/embed`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: OLLAMA_EMBED_MODEL, input: text }),
@@ -99,7 +104,7 @@ export class OllamaProvider implements AIProvider {
       this.buildSystemPrompt(context) +
       "\n\nResponde SOLO con JSON válido. No incluyas texto antes ni después del JSON.";
 
-    const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    const response = await fetch(`${this.baseUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -124,7 +129,7 @@ export class OllamaProvider implements AIProvider {
 
   async isAvailable(): Promise<boolean> {
     try {
-      const response = await fetch(`${OLLAMA_BASE_URL}/api/tags`, {
+      const response = await fetch(`${this.baseUrl}/api/tags`, {
         signal: AbortSignal.timeout(3000),
       });
       return response.ok;

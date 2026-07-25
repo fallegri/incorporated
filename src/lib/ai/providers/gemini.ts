@@ -1,4 +1,4 @@
-import { google } from "@ai-sdk/google";
+import { google, createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText, streamText, embed, embedMany } from "ai";
 import { z } from "zod";
 import {
@@ -20,13 +20,28 @@ export class GeminiProvider implements AIProvider {
     embeddingDimensions: 768,
   };
 
+  private apiKey?: string;
+
+  constructor(apiKey?: string) {
+    this.apiKey = apiKey;
+  }
+
+  private get googleClient() {
+    const key = this.apiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (this.apiKey) {
+      // Use custom API key via provider factory
+      return createGoogleGenerativeAI({ apiKey: this.apiKey });
+    }
+    return google;
+  }
+
   private get model() {
-    // Using gemini-2.0-flash — stable, free tier, confirmed working
-    return google("gemini-2.0-flash");
+    // Using gemini-2.0-flash - stable, free tier, confirmed working
+    return this.googleClient("gemini-2.0-flash");
   }
 
   private get embeddingModel() {
-    return google.textEmbeddingModel("text-embedding-004");
+    return this.googleClient.textEmbeddingModel("text-embedding-004");
   }
 
   async *chat(messages: ChatMessage[], context?: RAGContext): AsyncIterable<string> {
@@ -83,7 +98,7 @@ export class GeminiProvider implements AIProvider {
 
   async isAvailable(): Promise<boolean> {
     try {
-      const key = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+      const key = this.apiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
       return !!key && key.length > 0;
     } catch {
       return false;

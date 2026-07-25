@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { createAIProvider } from "@/lib/ai/providers";
 import { ChatMessage } from "@/lib/ai/types";
 
@@ -8,6 +9,8 @@ export async function POST(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
+
+  const user = session.user as any;
 
   try {
     const { message, history } = await request.json();
@@ -19,7 +22,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const provider = createAIProvider();
+    // Read org AI settings from database
+    const org = user.organizationId
+      ? await prisma.organization.findUnique({
+          where: { id: user.organizationId },
+          select: { aiProvider: true, aiApiKey: true, ollamaUrl: true },
+        })
+      : null;
+
+    const provider = createAIProvider(
+      org?.aiProvider as any,
+      org?.aiApiKey || undefined,
+      org?.ollamaUrl || undefined
+    );
 
     if (!provider.capabilities.chat) {
       return NextResponse.json({

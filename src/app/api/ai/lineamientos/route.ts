@@ -15,7 +15,17 @@ export async function POST() {
   const user = session.user as any;
 
   try {
-    const provider = createAIProvider();
+    // Read org AI settings from database
+    const org = await prisma.organization.findUnique({
+      where: { id: user.organizationId },
+      select: { aiProvider: true, aiApiKey: true, ollamaUrl: true },
+    });
+
+    const provider = createAIProvider(
+      org?.aiProvider as any,
+      org?.aiApiKey || undefined,
+      org?.ollamaUrl || undefined
+    );
 
     if (!provider.capabilities.structuredOutput) {
       return NextResponse.json(

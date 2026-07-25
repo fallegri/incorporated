@@ -38,6 +38,8 @@ model Organization {
   name       String
   mode       AppMode   @default(enterprise)
   aiProvider AIProvider @default(none) @map("ai_provider")
+  aiApiKey   String?   @map("ai_api_key")
+  ollamaUrl  String?   @map("ollama_url")
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 

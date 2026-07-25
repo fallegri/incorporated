@@ -20,10 +20,20 @@ export class NvidiaProvider implements AIProvider {
     embeddingDimensions: 1024,
   };
 
+  private apiKey?: string;
+
+  constructor(apiKey?: string) {
+    this.apiKey = apiKey;
+  }
+
+  private get resolvedApiKey(): string | undefined {
+    return this.apiKey || process.env.NVIDIA_API_KEY;
+  }
+
   private get client() {
     return createOpenAI({
       baseURL: "https://integrate.api.nvidia.com/v1",
-      apiKey: process.env.NVIDIA_API_KEY,
+      apiKey: this.resolvedApiKey,
     });
   }
 
@@ -58,7 +68,7 @@ export class NvidiaProvider implements AIProvider {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.NVIDIA_API_KEY}`,
+        Authorization: `Bearer ${this.resolvedApiKey}`,
       },
       body: JSON.stringify({
         model: "nvidia/nv-embedqa-e5-v5",
@@ -82,7 +92,7 @@ export class NvidiaProvider implements AIProvider {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.NVIDIA_API_KEY}`,
+        Authorization: `Bearer ${this.resolvedApiKey}`,
       },
       body: JSON.stringify({
         model: "nvidia/nv-embedqa-e5-v5",
@@ -120,7 +130,7 @@ export class NvidiaProvider implements AIProvider {
 
   async isAvailable(): Promise<boolean> {
     try {
-      const key = process.env.NVIDIA_API_KEY;
+      const key = this.resolvedApiKey;
       return !!key && key.length > 0;
     } catch {
       return false;

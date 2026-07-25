@@ -1,0 +1,8 @@
+{
+  "task_id": "task-ai-api-key",
+  "task_description": "Allow organizations to store their own AI API key in the database (per-org config)",
+  "status": "in_progress",
+  "feature_order": ["FEAT-003"],
+  "blocked_reason": null,
+  "verification": null
+}
