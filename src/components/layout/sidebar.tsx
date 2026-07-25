@@ -34,6 +34,7 @@ const navGroups: NavGroup[] = [
       { href: "/objetivos", label: "Objetivos y Metas", icon: "🎯", roles: "all" },
       { href: "/actividades", label: "Mis Actividades", icon: "✅", roles: "all" },
       { href: "/kpis", label: "Mis KPIs", icon: "📈", roles: "all" },
+      { href: "/timeline", label: "Linea de Tiempo", icon: "📅", roles: "all" },
       { href: "/cargo", label: "Checklist Onboarding", icon: "📋", roles: "all" },
     ],
   },
@@ -42,6 +43,8 @@ const navGroups: NavGroup[] = [
     roles: "all",
     items: [
       { href: "/documentos", label: "Biblioteca de Documentos", icon: "📄", roles: "all" },
+      { href: "/glosario", label: "Glosario Institucional", icon: "📖", roles: "all" },
+      { href: "/faq", label: "Preguntas Frecuentes", icon: "❓", roles: "all" },
       { href: "/construir", label: "Construir Lineamientos", icon: "🏗️", roles: "all" },
       { href: "/asistente", label: "Asistente IA", icon: "💬", roles: "all" },
     ],
