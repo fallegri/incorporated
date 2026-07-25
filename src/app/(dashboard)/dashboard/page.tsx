@@ -1,10 +1,25 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { redirect } from "next/navigation";
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
 
 export default async function DashboardPage() {
   const session = await auth();
   const user = session?.user as any;
+
+  // Redirect ADMIN users to setup wizard if org is still in setup status
+  if (
+    user?.organizationId &&
+    (user.role === "ADMIN" || user.role === "SUPER_ADMIN")
+  ) {
+    const orgCheck = await prisma.organization.findUnique({
+      where: { id: user.organizationId },
+      select: { status: true },
+    });
+    if (orgCheck?.status === "setup") {
+      redirect("/setup");
+    }
+  }
 
   // Fetch real data from DB
   let objetivos: any[] = [];

@@ -35,6 +35,7 @@ async function main() {
     data: {
       name: "Corporación TechNova S.A.",
       mode: "enterprise",
+      status: "active",
       aiProvider: "none",
     },
   });
@@ -191,6 +192,7 @@ async function main() {
     data: {
       name: "Consultoría Diego Paredes",
       mode: "individual",
+      status: "active",
       aiProvider: "none",
     },
   });

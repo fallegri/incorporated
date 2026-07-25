@@ -37,6 +37,10 @@ model Organization {
   id         String    @id @default(cuid())
   name       String
   mode       AppMode   @default(enterprise)
+  status     String    @default("setup") @map("status")
+  mision     String?   @map("mision")
+  vision     String?   @map("vision")
+  sector     String?   @map("sector")
   aiProvider AIProvider @default(none) @map("ai_provider")
   aiApiKey   String?   @map("ai_api_key")
   ollamaUrl  String?   @map("ollama_url")
