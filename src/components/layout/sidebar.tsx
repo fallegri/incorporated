@@ -54,7 +54,7 @@ const navGroups: NavGroup[] = [
     roles: "ADMIN,SUPER_ADMIN,DIRECTOR,JEFE_AREA",
     items: [
       { href: "/admin", label: "Equipo y Avance", icon: "👥", roles: "ADMIN,SUPER_ADMIN,DIRECTOR,JEFE_AREA" },
-      { href: "/admin/configuracion", label: "Estructura", icon: "🏢", roles: "ADMIN,SUPER_ADMIN,DIRECTOR" },
+      { href: "/admin/estructura", label: "Estructura", icon: "🏢", roles: "ADMIN,SUPER_ADMIN,DIRECTOR" },
       { href: "/reportes", label: "Reportes", icon: "📑", roles: "ADMIN,SUPER_ADMIN,DIRECTOR,JEFE_AREA" },
     ],
   },
@@ -62,7 +62,7 @@ const navGroups: NavGroup[] = [
     title: "SISTEMA",
     roles: "all",
     items: [
-      { href: "/admin/configuracion", label: "Configuracion", icon: "⚙️", roles: "all" },
+      { href: "/admin/configuracion", label: "Configuracion IA", icon: "⚙️", roles: "all" },
       { href: "/notificaciones", label: "Notificaciones", icon: "🔔", roles: "all" },
     ],
   },
